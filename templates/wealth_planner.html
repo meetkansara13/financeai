@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Wealth Planner — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/app.js"></script>
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-light: #e8c872;
+            --gold-dim: rgba(201, 168, 76, 0.12);
+            --gold-glow: rgba(201, 168, 76, 0.22);
+            --cyan: #63d1ff;
+            --green: #22c55e;
+            --red: #f87171;
+            --amber: #f59e0b;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #e2e8f0;
+            --muted: #475569;
+            --sub: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
+            padding: 36px 48px;
+            flex: 1;
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        /* Summary KPIs */
+        .profile-summary {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 14px;
+            margin-bottom: 24px;
+        }
+
+        .summary-kpi {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px 18px;
+            transition: border-color .2s;
+        }
+
+        .summary-kpi:hover {
+            border-color: rgba(201, 168, 76, .25);
+        }
+
+        .sk-label {
+            font-size: 11px;
+            color: var(--muted);
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .sk-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text);
+            font-family: 'DM Serif Display', serif;
+        }
+
+        .sk-value.green {
+            color: var(--green);
+        }
+
+        .sk-value.red {
+            color: var(--red);
+        }
+
+        .sk-value.gold {
+            color: var(--gold);
+        }
+
+        /* Verification Bar */
+        .verification-bar {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 18px 22px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .vb-left {
+            flex-shrink: 0;
+        }
+
+        .vb-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 2px;
+        }
+
+        .vb-sub {
+            font-size: 11px;
+            color: var(--muted);
+        }
+
+        .vb-track {
+            flex: 1;
+            min-width: 200px;
+        }
+
+        .vb-track-bg {
+            height: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .vb-track-fill {
+            height: 100%;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--gold), var(--green));
+            transition: width 1s ease;
+        }
+
+        .vb-pct {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .vb-pct strong {
+            color: var(--gold);
+            font-size: 14px;
+        }
+
+        .vb-badges {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .vb-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .vb-badge.verified {
+            background: rgba(34, 197, 94, .12);
+            border: 1px solid rgba(34, 197, 94, .25);
+            color: var(--green);
+        }
+
+        .vb-badge.pending {
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .25);
+            color: var(--amber);
+        }
+
+        .vb-badge.unverified {
+            background: rgba(100, 116, 139, .1);
+            border: 1px solid rgba(100, 116, 139, .2);
+            color: var(--sub);
+        }
+
+        /* Step Nav */
+        .step-nav {
+            display: flex;
+            gap: 0;
+            margin-bottom: 24px;
+            background: rgba(15, 20, 32, .6);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+        }
+
+        .step-tab {
+            flex: 1;
+            padding: 14px 8px;
+            text-align: center;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 11.5px;
+            font-weight: 500;
+            color: var(--muted);
+            border-right: 1px solid var(--border);
+            transition: all .2s;
+        }
+
+        .step-tab:last-child {
+            border-right: none;
+        }
+
+        .st-num {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .06);
+            border: 1px solid var(--border);
+            font-size: 10px;
+            font-weight: 700;
+            margin: 0 auto 5px;
+            transition: all .2s;
+        }
+
+        .step-tab.active {
+            background: rgba(201, 168, 76, .08);
+            color: var(--gold);
+        }
+
+        .step-tab.active .st-num {
+            background: var(--gold);
+            border-color: var(--gold);
+            color: #0e0c06;
+        }
+
+        .step-tab.done {
+            color: var(--green);
+        }
+
+        .step-tab.done .st-num {
+            background: rgba(34, 197, 94, .15);
+            border-color: var(--green);
+            color: var(--green);
+        }
+
+        /* Form Steps */
+        .form-step {
+            display: none;
+            animation: fadeUp .35s ease;
+        }
+
+        .form-step.active {
+            display: block;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+
+        /* Sections */
+        .wp-section {
+            background: rgba(15, 20, 32, .6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 26px 28px;
+            margin-bottom: 18px;
+        }
+
+        .wp-section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .ws-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            background: var(--gold-dim);
+            border: 1px solid rgba(201, 168, 76, .2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .ws-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .ws-sub {
+            font-size: 11.5px;
+            color: var(--muted);
+            margin-top: 2px;
+        }
+
+        .ws-req-badge {
+            margin-left: auto;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 10.5px;
+            font-weight: 600;
+            background: rgba(245, 158, 11, .1);
+            border: 1px solid rgba(245, 158, 11, .2);
+            color: var(--amber);
+        }
+
+        .ws-req-badge.auto {
+            background: rgba(34, 197, 94, .1);
+            border-color: rgba(34, 197, 94, .2);
+            color: var(--green);
+        }
+
+        .ws-req-badge.bureau {
+            background: rgba(99, 209, 255, .08);
+            border-color: rgba(99, 209, 255, .2);
+            color: var(--cyan);
+        }
+
+        /* Fields */
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .field-grid.cols-3 {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .field-grid.cols-1 {
+            grid-template-columns: 1fr;
+        }
+
+        .wp-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .wp-field label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--sub);
+            letter-spacing: .4px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .req-star {
+            color: var(--red);
+            font-size: 12px;
+        }
+
+        .field-hint {
+            font-size: 10px;
+            color: var(--muted);
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+        }
+
+        .wp-input,
+        .wp-select {
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13.5px;
+            outline: none;
+            transition: border-color .2s, background .2s;
+            width: 100%;
+        }
+
+        .wp-select {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            cursor: pointer;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2364748b' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 13px center;
+            padding-right: 36px;
+        }
+
+        .wp-select option {
+            background-color: #1e293b;
+            color: #e2e8f0;
+            font-size: 13.5px;
+        }
+
+        .wp-select option:hover,
+        .wp-select option:checked {
+            background-color: #2d3f55;
+            color: #e2e8f0;
+        }
+
+        .wp-input:focus,
+        .wp-select:focus {
+            border-color: rgba(201, 168, 76, .4);
+            background-color: #243044;
+        }
+
+        .wp-input::placeholder {
+            color: var(--muted);
+        }
+
+        .wp-input[readonly] {
+            color: var(--gold);
+            background: rgba(201, 168, 76, .05);
+            border-color: rgba(201, 168, 76, .15);
+        }
+
+        .wp-input.has-prefix {
+            padding-left: 34px;
+        }
+
+        .input-wrap {
+            position: relative;
+        }
+
+        .input-prefix {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sub);
+            font-size: 13px;
+            pointer-events: none;
+            font-weight: 600;
+        }
+
+        /* Upload */
+        .upload-field {
+            border: 1.5px dashed rgba(201, 168, 76, .25);
+            border-radius: 10px;
+            padding: 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color .2s, background .2s;
+            background: rgba(201, 168, 76, .03);
+            position: relative;
+        }
+
+        .upload-field:hover {
+            border-color: rgba(201, 168, 76, .5);
+            background: rgba(201, 168, 76, .06);
+        }
+
+        .upload-field input[type=file] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+            width: 100%;
+            height: 100%;
+        }
+
+        .upload-icon {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .upload-label {
+            font-size: 11.5px;
+            color: var(--muted);
+        }
+
+        .upload-label strong {
+            color: var(--gold);
+        }
+
+        .upload-status {
+            font-size: 11px;
+            color: var(--green);
+            margin-top: 5px;
+            display: none;
+        }
+
+        .upload-status.show {
+            display: block;
+        }
+
+        /* Actions */
+        .step-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-back,
+        .btn-next,
+        .btn-submit {
+            padding: 11px 22px;
+            border-radius: 10px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: all .18s;
+        }
+
+        .btn-back {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid var(--border);
+            color: var(--sub);
+        }
+
+        .btn-back:hover {
+            background: rgba(255, 255, 255, .08);
+            color: var(--text);
+        }
+
+        .btn-next {
+            background: linear-gradient(135deg, var(--gold), var(--gold-light));
+            color: #0e0c06;
+            box-shadow: 0 4px 16px var(--gold-glow);
+        }
+
+        .btn-next:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 22px var(--gold-glow);
+        }
+
+        .btn-submit {
+            background: linear-gradient(135deg, var(--green), #16a34a);
+            color: white;
+            box-shadow: 0 4px 16px rgba(34, 197, 94, .25);
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-1px);
+        }
+
+        .step-progress-text {
+            font-size: 12px;
+            color: var(--muted);
+        }
+
+        .step-progress-text strong {
+            color: var(--gold);
+        }
+
+        /* Disclaimer */
+        .disclaimer {
+            background: rgba(245, 158, 11, .05);
+            border: 1px solid rgba(245, 158, 11, .15);
+            border-radius: 10px;
+            padding: 12px 16px;
+            font-size: 11.5px;
+            color: var(--muted);
+            line-height: 1.6;
+            margin-top: 16px;
+        }
+
+        .disclaimer strong {
+            color: var(--amber);
+        }
+
+        /* Charts */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .chart-card-wp {
+            background: rgba(15, 20, 32, .6);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 22px;
+        }
+
+        .chart-card-wp h3 {
+            font-size: 13px;
+            color: var(--sub);
+            margin-bottom: 14px;
+            font-weight: 600;
+        }
+
+        .chart-box-wp {
+            height: 220px;
+        }
+
+        /* Success Screen */
+        .success-screen {
+            display: none;
+            text-align: center;
+            padding: 60px 40px;
+            animation: fadeUp .5s ease;
+        }
+
+        .success-screen.show {
+            display: block;
+        }
+
+        .success-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .success-screen h2 {
+            font-family: 'DM Serif Display', serif;
+            font-size: 28px;
+            color: var(--text);
+            margin-bottom: 10px;
+        }
+
+        .success-screen p {
+            font-size: 14px;
+            color: var(--sub);
+            max-width: 500px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+        }
+
+        .verification-checklist {
+            text-align: left;
+            max-width: 440px;
+            margin: 0 auto 28px;
+        }
+
+        .vc-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 13px;
+        }
+
+        .vc-item:last-child {
+            border-bottom: none;
+        }
+
+        .vc-label {
+            flex: 1;
+            color: var(--text);
+        }
+
+        .vc-badge {
+            font-size: 10.5px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+
+        .vc-badge.auto {
+            background: rgba(34, 197, 94, .15);
+            color: var(--green);
+        }
+
+        .vc-badge.review {
+            background: rgba(245, 158, 11, .12);
+            color: var(--amber);
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            z-index: 9999;
+            padding: 14px 20px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .4);
+            animation: toastIn .35s cubic-bezier(.16, 1, .3, 1);
+            max-width: 340px;
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+        }
+
+        .toast.success {
+            background: rgba(21, 128, 61, .95);
+            border: 1px solid rgba(34, 197, 94, .3);
+            color: #fff;
+        }
+
+        .toast.info {
+            background: rgba(30, 41, 59, .98);
+            border: 1px solid rgba(99, 209, 255, .3);
+            color: #fff;
+        }
+
+        @keyframes toastIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        {% include "sidebar.html" %}
+
+        <div class="page-wrapper">
+
+            <div class="topnav">
+                <div class="logo">FinanceAI</div>
+                <input class="search-box" placeholder="Search..." />
+            </div>
+
+            <div class="page-header">
+                <h1>Wealth Profile & KYC Centre</h1>
+                <p>Bank-grade financial profiling · Secure · Verified · Encrypted end-to-end</p>
+            </div>
+
+            <!-- SUMMARY BAR -->
+            <div class="profile-summary">
+                <div class="summary-kpi">
+                    <div class="sk-label">Total Income</div>
+                    <div class="sk-value green" id="sk-income">₹—</div>
+                </div>
+                <div class="summary-kpi">
+                    <div class="sk-label">Total Assets</div>
+                    <div class="sk-value gold" id="sk-assets">₹—</div>
+                </div>
+                <div class="summary-kpi">
+                    <div class="sk-label">Liabilities</div>
+                    <div class="sk-value red" id="sk-liabilities">₹—</div>
+                </div>
+                <div class="summary-kpi">
+                    <div class="sk-label">Net Worth</div>
+                    <div class="sk-value" id="sk-networth">₹—</div>
+                </div>
+                <div class="summary-kpi">
+                    <div class="sk-label">Savings Rate</div>
+                    <div class="sk-value" id="sk-savings">—%</div>
+                </div>
+            </div>
+
+            <!-- VERIFICATION BAR -->
+            <div class="verification-bar">
+                <div class="vb-left">
+                    <div class="vb-title">🛡️ Profile Verification Status</div>
+                    <div class="vb-sub">Complete all sections to unlock 100% verified status</div>
+                </div>
+                <div class="vb-track">
+                    <div class="vb-track-bg">
+                        <div class="vb-track-fill" id="verifyFill" style="width:0%"></div>
+                    </div>
+                    <div class="vb-pct">Verification: <strong id="verifyPct">0%</strong></div>
+                </div>
+                <div class="vb-badges">
+                    <span class="vb-badge unverified" id="badge-identity">🪪 Identity</span>
+                    <span class="vb-badge unverified" id="badge-income">💼 Income</span>
+                    <span class="vb-badge unverified" id="badge-assets">🏦 Assets</span>
+                    <span class="vb-badge unverified" id="badge-liabilities">📋 Liabilities</span>
+                </div>
+            </div>
+
+            <!-- STEP NAV -->
+            <div class="step-nav">
+                <button class="step-tab active" id="tab-1" onclick="goToStep(1)">
+                    <div class="st-num"><span>1</span></div>Personal Identity
+                </button>
+                <button class="step-tab" id="tab-2" onclick="goToStep(2)">
+                    <div class="st-num"><span>2</span></div>Income Sources
+                </button>
+                <button class="step-tab" id="tab-3" onclick="goToStep(3)">
+                    <div class="st-num"><span>3</span></div>Assets & Investments
+                </button>
+                <button class="step-tab" id="tab-4" onclick="goToStep(4)">
+                    <div class="st-num"><span>4</span></div>Liabilities & Credit
+                </button>
+                <button class="step-tab" id="tab-5" onclick="goToStep(5)">
+                    <div class="st-num"><span>5</span></div>Review & Submit
+                </button>
+            </div>
+
+            <!-- STEP 1: IDENTITY -->
+            <div class="form-step active" id="step-1">
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">🪪</div>
+                        <div>
+                            <div class="ws-title">Personal Identity Verification</div>
+                            <div class="ws-sub">KYC compliant · Auto-verified against government records</div>
+                        </div>
+                        <span class="ws-req-badge auto">Auto Verified</span>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>Full Name <span class="req-star">*</span></label><input
+                                class="wp-input" id="fullName" placeholder="As per PAN card" /></div>
+                        <div class="wp-field"><label>Date of Birth <span class="req-star">*</span></label><input
+                                class="wp-input" type="date" id="dob" /></div>
+                        <div class="wp-field"><label>PAN Number <span class="req-star">*</span></label><input
+                                class="wp-input" id="pan" placeholder="ABCDE1234F" maxlength="10"
+                                style="text-transform:uppercase" /></div>
+                        <div class="wp-field"><label>Aadhaar Number <span class="req-star">*</span></label><input
+                                class="wp-input" id="aadhaar" placeholder="XXXX XXXX XXXX" maxlength="14" /></div>
+                        <div class="wp-field"><label>Mobile Number <span class="req-star">*</span></label><input
+                                class="wp-input" id="mobile" placeholder="+91 98765 43210" /></div>
+                        <div class="wp-field"><label>Email Address <span class="req-star">*</span></label><input
+                                class="wp-input" type="email" id="emailAddr" placeholder="your@email.com" /></div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">🏠</div>
+                        <div>
+                            <div class="ws-title">Address Details</div>
+                            <div class="ws-sub">Current residential address</div>
+                        </div>
+                    </div>
+                    <div class="field-grid cols-1" style="margin-bottom:14px;">
+                        <div class="wp-field"><label>Address Line 1 <span class="req-star">*</span></label><input
+                                class="wp-input" id="addr1" placeholder="Flat/House No., Street, Area, Locality" />
+                        </div>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>City <span class="req-star">*</span></label><input class="wp-input"
+                                id="city" placeholder="e.g. Ahmedabad" /></div>
+                        <div class="wp-field"><label>State <span class="req-star">*</span></label>
+                            <select class="wp-select" id="state">
+                                <option value="">Select State</option>
+                                <option>Gujarat</option>
+                                <option>Maharashtra</option>
+                                <option>Delhi</option>
+                                <option>Karnataka</option>
+                                <option>Tamil Nadu</option>
+                                <option>Rajasthan</option>
+                                <option>Uttar Pradesh</option>
+                                <option>West Bengal</option>
+                                <option>Telangana</option>
+                                <option>Kerala</option>
+                                <option>Madhya Pradesh</option>
+                                <option>Punjab</option>
+                                <option>Haryana</option>
+                                <option>Other</option>
+                            </select>
+                        </div>
+                        <div class="wp-field"><label>PIN Code <span class="req-star">*</span></label><input
+                                class="wp-input" id="pincode" placeholder="380001" maxlength="6" /></div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">👤</div>
+                        <div>
+                            <div class="ws-title">Professional Profile</div>
+                            <div class="ws-sub">Employment & occupation details</div>
+                        </div>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>Occupation Type <span class="req-star">*</span></label>
+                            <select class="wp-select" id="occupation">
+                                <option value="">Select</option>
+                                <option>Salaried — Private</option>
+                                <option>Salaried — Government</option>
+                                <option>Self Employed — Business</option>
+                                <option>Self Employed — Professional</option>
+                                <option>Freelancer</option>
+                                <option>Student</option>
+                                <option>Retired</option>
+                                <option>Homemaker</option>
+                            </select>
+                        </div>
+                        <div class="wp-field"><label>Employer / Business Name</label><input class="wp-input"
+                                id="employer" placeholder="Company or business name" /></div>
+                        <div class="wp-field"><label>Annual Income Bracket</label>
+                            <select class="wp-select" id="incomeBracket">
+                                <option value="">Select range</option>
+                                <option>Below ₹3 Lakh</option>
+                                <option>₹3L – ₹7.5L</option>
+                                <option>₹7.5L – ₹15L</option>
+                                <option>₹15L – ₹30L</option>
+                                <option>Above ₹30L</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <span class="step-progress-text">Step <strong>1</strong> of 5</span>
+                    <button class="btn-next" onclick="nextStep(1)">Next: Income Sources →</button>
+                </div>
+            </div>
+
+            <!-- STEP 2: INCOME -->
+            <div class="form-step" id="step-2">
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">💼</div>
+                        <div>
+                            <div class="ws-title">Monthly Income Sources</div>
+                            <div class="ws-sub">All values in ₹ per month · Verified via ITR / Salary Slip</div>
+                        </div>
+                        <span class="ws-req-badge">Document Required</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="wp-field"><label>Salary / Business Income <span class="req-star">*</span></label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="salary" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Side / Freelance Income</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="sideIncome" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Rental Income</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="rentalIncome" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Dividend / Passive Income</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="passiveIncome" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                    </div>
+                    <div class="disclaimer"><strong>📄 Note:</strong> Income is cross-verified with ITR filing and
+                        salary slips. Self-declared income is accepted provisionally until documents are reviewed (24–48
+                        hrs).</div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">📄</div>
+                        <div>
+                            <div class="ws-title">Income Documents</div>
+                            <div class="ws-sub">Upload for faster verification</div>
+                        </div>
+                        <span class="ws-req-badge auto">Optional</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="wp-field"><label>Latest Salary Slip (Last 3 months)</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'salary-status','salary_slip')" />
+                                <div class="upload-icon">📎</div>
+                                <div class="upload-label"><strong>Click to upload</strong> · PDF / JPG / PNG · Max 5MB
+                                </div>
+                                <div class="upload-status" id="salary-status">✅ Uploaded successfully</div>
+                            </div>
+                        </div>
+                        <div class="wp-field"><label>ITR / Form 16 (Last FY)</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'itr-status','itr')" />
+                                <div class="upload-icon">🗂️</div>
+                                <div class="upload-label"><strong>Click to upload</strong> · PDF / JPG / PNG · Max 5MB
+                                </div>
+                                <div class="upload-status" id="itr-status">✅ Uploaded successfully</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <button class="btn-back" onclick="prevStep(2)">← Back</button>
+                    <span class="step-progress-text">Step <strong>2</strong> of 5</span>
+                    <button class="btn-next" onclick="nextStep(2)">Next: Assets →</button>
+                </div>
+            </div>
+
+            <!-- STEP 3: ASSETS -->
+            <div class="form-step" id="step-3">
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">📈</div>
+                        <div>
+                            <div class="ws-title">Equity & Market Investments</div>
+                            <div class="ws-sub">Current market value as of today</div>
+                        </div>
+                        <span class="ws-req-badge auto">Self Declared</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="wp-field"><label>Stocks / Equity Portfolio</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="stocks" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Mutual Funds / SIP (Current Value)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="mutualFunds" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Bonds / NPS / Debentures</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="bonds" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Crypto / Digital Assets</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="crypto" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">🏠</div>
+                        <div>
+                            <div class="ws-title">Physical & Fixed Assets</div>
+                            <div class="ws-sub">Property, gold, vehicles · Documents required for verification</div>
+                        </div>
+                        <span class="ws-req-badge">Document Required</span>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>Real Estate (Market Value)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="realEstate" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Gold / Silver (Current Value)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="gold" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Vehicles (Resale Value)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="vehicles" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Cash / Bank Savings</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="cash" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Fixed Deposits / PPF / EPF</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="fixedDeposits" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Insurance (Surrender Value)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="insurance" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                    </div>
+                    <div class="field-grid" style="margin-top:16px;">
+                        <div class="wp-field"><label>Property / Registry Documents</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'property-status','property')" />
+                                <div class="upload-icon">🏡</div>
+                                <div class="upload-label"><strong>Sale deed / Registry</strong> · PDF · Max 5MB</div>
+                                <div class="upload-status" id="property-status">✅ Uploaded</div>
+                            </div>
+                        </div>
+                        <div class="wp-field"><label>Demat / Portfolio Statement</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'demat-status','demat')" />
+                                <div class="upload-icon">📊</div>
+                                <div class="upload-label"><strong>NSDL / CDSL statement</strong> · PDF · Max 5MB</div>
+                                <div class="upload-status" id="demat-status">✅ Uploaded</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <button class="btn-back" onclick="prevStep(3)">← Back</button>
+                    <span class="step-progress-text">Step <strong>3</strong> of 5</span>
+                    <button class="btn-next" onclick="nextStep(3)">Next: Liabilities →</button>
+                </div>
+            </div>
+
+            <!-- STEP 4: LIABILITIES -->
+            <div class="form-step" id="step-4">
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">🏦</div>
+                        <div>
+                            <div class="ws-title">Loans & Borrowings</div>
+                            <div class="ws-sub">Outstanding principal amounts · Bureau-verified via CIBIL</div>
+                        </div>
+                        <span class="ws-req-badge bureau">Bureau Verified</span>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>Home Loan (Outstanding)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="homeLoan" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Car / Vehicle Loan</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="carLoan" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Personal Loan</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="personalLoan" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Education Loan</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="eduLoan" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Business Loan</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="bizLoan" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>Other Loans</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="otherLoans" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">💳</div>
+                        <div>
+                            <div class="ws-title">Credit Cards & Monthly Obligations</div>
+                            <div class="ws-sub">Outstanding balances and recurring commitments</div>
+                        </div>
+                        <span class="ws-req-badge bureau">Bureau Verified</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="wp-field"><label>Credit Card Outstanding (Total)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="creditCard" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                        <div class="wp-field"><label>CIBIL Score <span
+                                    class="field-hint">(Self-declared)</span></label><input class="wp-input" id="cibil"
+                                type="number" placeholder="300–900" min="300" max="900" /></div>
+                        <div class="wp-field"><label>Total Monthly EMI Obligations</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="totalEmi" type="number"
+                                    placeholder="Sum of all EMIs" /></div>
+                        </div>
+                        <div class="wp-field"><label>Fixed Monthly Expenses (Rent etc.)</label>
+                            <div class="input-wrap"><span class="input-prefix">₹</span><input
+                                    class="wp-input has-prefix" id="fixedExpense" type="number" placeholder="0"
+                                    oninput="updateSummary()" /></div>
+                        </div>
+                    </div>
+                    <div class="disclaimer"><strong>🔒 Bureau Note:</strong> With your consent, outstanding loan amounts
+                        are fetched from CIBIL / Equifax using your PAN. Your data is encrypted and never shared with
+                        third parties.</div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">📋</div>
+                        <div>
+                            <div class="ws-title">Liability Documents</div>
+                            <div class="ws-sub">Speeds up bureau verification</div>
+                        </div>
+                        <span class="ws-req-badge auto">Optional</span>
+                    </div>
+                    <div class="field-grid">
+                        <div class="wp-field"><label>Loan Sanction / Statement</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'loan-status','loan')" />
+                                <div class="upload-icon">📑</div>
+                                <div class="upload-label"><strong>Bank loan statement</strong> · PDF · Max 5MB</div>
+                                <div class="upload-status" id="loan-status">✅ Uploaded</div>
+                            </div>
+                        </div>
+                        <div class="wp-field"><label>Credit Card Statement (3 months)</label>
+                            <div class="upload-field"><input type="file" accept=".pdf,.jpg,.png"
+                                    onchange="uploadAndVerify(this,'cc-status','credit_card')" />
+                                <div class="upload-icon">💳</div>
+                                <div class="upload-label"><strong>Card statement PDF</strong> · PDF · Max 5MB</div>
+                                <div class="upload-status" id="cc-status">✅ Uploaded</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <button class="btn-back" onclick="prevStep(4)">← Back</button>
+                    <span class="step-progress-text">Step <strong>4</strong> of 5</span>
+                    <button class="btn-next" onclick="nextStep(4)">Next: Review →</button>
+                </div>
+            </div>
+
+            <!-- STEP 5: REVIEW -->
+            <div class="form-step" id="step-5">
+                <div class="chart-row">
+                    <div class="chart-card-wp">
+                        <h3>🍩 Asset Allocation</h3>
+                        <div class="chart-box-wp"><canvas id="assetChart"></canvas></div>
+                    </div>
+                    <div class="chart-card-wp">
+                        <h3>📊 Income vs Expenses</h3>
+                        <div class="chart-box-wp"><canvas id="incomeExpenseChart"></canvas></div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">✅</div>
+                        <div>
+                            <div class="ws-title">Profile Summary — Review Before Submit</div>
+                            <div class="ws-sub">Calculated automatically from your inputs</div>
+                        </div>
+                    </div>
+                    <div class="field-grid cols-3">
+                        <div class="wp-field"><label>Total Monthly Income</label><input class="wp-input" id="rev-income"
+                                readonly /></div>
+                        <div class="wp-field"><label>Total Assets</label><input class="wp-input" id="rev-assets"
+                                readonly /></div>
+                        <div class="wp-field"><label>Total Liabilities</label><input class="wp-input"
+                                id="rev-liabilities" readonly /></div>
+                        <div class="wp-field"><label>Net Worth</label><input class="wp-input" id="rev-networth"
+                                readonly /></div>
+                        <div class="wp-field"><label>Savings Rate</label><input class="wp-input" id="rev-savings"
+                                readonly /></div>
+                        <div class="wp-field"><label>Recommended Expense Cap (60%)</label><input class="wp-input"
+                                id="rev-expcap" readonly /></div>
+                    </div>
+                </div>
+                <div class="wp-section">
+                    <div class="wp-section-header">
+                        <div class="ws-icon">🛡️</div>
+                        <div>
+                            <div class="ws-title">Declaration & Consent</div>
+                            <div class="ws-sub">Required to complete submission</div>
+                        </div>
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:14px;">
+                        <label
+                            style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--sub);">
+                            <input type="checkbox" id="consent1" style="margin-top:3px;accent-color:#c9a84c;" />
+                            I confirm that all information provided is accurate and true to the best of my knowledge.
+                        </label>
+                        <label
+                            style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--sub);">
+                            <input type="checkbox" id="consent2" style="margin-top:3px;accent-color:#c9a84c;" />
+                            I authorize FinanceAI to verify my income and liabilities via CIBIL / credit bureau using my
+                            PAN and Aadhaar.
+                        </label>
+                        <label
+                            style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;font-size:13px;color:var(--sub);">
+                            <input type="checkbox" id="consent3" style="margin-top:3px;accent-color:#c9a84c;" />
+                            I agree to the <a href="#" style="color:#c9a84c;">Terms & Conditions</a> and <a href="#"
+                                style="color:#c9a84c;">Privacy Policy</a>.
+                        </label>
+                    </div>
+                </div>
+                <div class="step-actions">
+                    <button class="btn-back" onclick="prevStep(5)">← Back</button>
+                    <span class="step-progress-text">Step <strong>5</strong> of 5 · Final Step</span>
+                    <button class="btn-submit" onclick="submitProfile()">🚀 Submit Wealth Profile</button>
+                </div>
+            </div>
+
+            <!-- SUCCESS SCREEN -->
+            <div class="success-screen" id="successScreen">
+                <div class="success-icon">🎉</div>
+                <h2>Profile Successfully Registered!</h2>
+                <p>Your wealth profile has been submitted and securely stored. Basic details are auto-verified.
+                    Documents requiring manual review are queued — you will be notified within 24–48 hours.</p>
+                <div class="verification-checklist">
+                    <div class="vc-item"><span>✅</span><span class="vc-label">Personal Identity (PAN +
+                            Aadhaar)</span><span class="vc-badge auto">Auto Verified</span></div>
+                    <div class="vc-item"><span>🕐</span><span class="vc-label">Income (Salary Slip / ITR)</span><span
+                            class="vc-badge review">Under Review</span></div>
+                    <div class="vc-item"><span>🕐</span><span class="vc-label">Assets (Property / Demat)</span><span
+                            class="vc-badge review">Under Review</span></div>
+                    <div class="vc-item"><span>🕐</span><span class="vc-label">Liabilities (CIBIL Bureau
+                            Check)</span><span class="vc-badge review">Under Review</span></div>
+                </div>
+                <div style="display:flex;gap:12px;justify-content:center;margin-top:4px;">
+                    <button class="btn-next" onclick="window.location.href='/dashboard'">← Back to Dashboard</button>
+                    <button class="btn-next"
+                        style="background:rgba(201,168,76,.12);color:#c9a84c;border:1px solid rgba(201,168,76,.25);"
+                        onclick="enterUpdateMode()">✏ Update Details</button>
+                </div>
+                <p style="font-size:11.5px;color:#475569;margin-top:16px;">⚠ Re-submitting will flag changed fields for
+                    re-verification.</p>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script src="/static/js/wealth.js?v=24"></script>
+</body>
+
+</html>

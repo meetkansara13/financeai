@@ -1,0 +1,634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>AI Insights — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+        rel="stylesheet">
+    <style>
+        body,
+        * {
+            font-family: 'DM Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .page-wrapper {
+            padding: 24px 28px;
+        }
+
+        /* Hero banner */
+        .ai-hero {
+            background: linear-gradient(135deg, rgba(201, 168, 76, .1), rgba(34, 197, 94, .06), rgba(99, 102, 241, .08));
+            border: 1px solid rgba(201, 168, 76, .2);
+            border-radius: 18px;
+            padding: 24px 28px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .ai-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            right: -40px;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(201, 168, 76, .12), transparent 70%);
+            pointer-events: none;
+        }
+
+        .ai-hero-ico {
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+
+        .ai-hero-text h2 {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f0f4ff;
+            margin: 0 0 4px;
+        }
+
+        .ai-hero-text p {
+            font-size: 13px;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .ai-hero-score {
+            margin-left: auto;
+            text-align: center;
+            flex-shrink: 0;
+            background: rgba(201, 168, 76, .1);
+            border: 1px solid rgba(201, 168, 76, .25);
+            border-radius: 14px;
+            padding: 14px 22px;
+        }
+
+        .ai-hero-score .big {
+            font-size: 32px;
+            font-weight: 700;
+            color: #c9a84c;
+        }
+
+        .ai-hero-score .lbl {
+            font-size: 10px;
+            color: #64748b;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 2px;
+        }
+
+        /* KPI grid */
+        .ai-kpi {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .ai-kpi-card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: all .2s;
+        }
+
+        .ai-kpi-card:hover {
+            border-color: rgba(255, 255, 255, .15);
+            transform: translateY(-2px);
+        }
+
+        .ai-kpi-lbl {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .ai-kpi-val {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 7px;
+        }
+
+        .ai-kpi-bar {
+            height: 3px;
+            border-radius: 3px;
+            margin-top: 10px;
+            background: rgba(255, 255, 255, .06);
+            overflow: hidden;
+        }
+
+        .ai-kpi-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s ease;
+        }
+
+        /* Two-col layout */
+        .ai-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ai-grid3 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .ai-card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 20px 22px;
+        }
+
+        .ai-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 3px;
+        }
+
+        .ai-card-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-bottom: 16px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 200px;
+        }
+
+        /* Recommendation cards */
+        .rec-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rec-card {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            background: rgba(255, 255, 255, .025);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 12px;
+            padding: 13px 15px;
+            transition: all .18s;
+        }
+
+        .rec-card:hover {
+            background: rgba(255, 255, 255, .045);
+            border-color: rgba(255, 255, 255, .1);
+        }
+
+        .rec-ico {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .rec-text {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            line-height: 1.6;
+        }
+
+        .rec-tag {
+            display: inline-block;
+            font-size: 9.5px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+
+        /* Projection timeline */
+        .proj-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .proj-year {
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            min-width: 36px;
+        }
+
+        .proj-bar-wrap {
+            flex: 1;
+            height: 6px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .proj-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            background: linear-gradient(90deg, #c9a84c, #22c55e);
+            transition: width 1.2s ease;
+        }
+
+        .proj-val {
+            font-size: 11px;
+            font-weight: 700;
+            color: #c9a84c;
+            min-width: 80px;
+            text-align: right;
+        }
+
+        /* Radar / risk indicators */
+        .risk-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 14px;
+        }
+
+        .risk-low {
+            background: rgba(34, 197, 94, .12);
+            color: #22c55e;
+            border: 1px solid rgba(34, 197, 94, .25);
+        }
+
+        .risk-medium {
+            background: rgba(201, 168, 76, .12);
+            color: #c9a84c;
+            border: 1px solid rgba(201, 168, 76, .25);
+        }
+
+        .risk-high {
+            background: rgba(248, 113, 113, .12);
+            color: #f87171;
+            border: 1px solid rgba(248, 113, 113, .25);
+        }
+
+        /* Chat bot */
+        .ai-chat-wrap {
+            background: rgba(255, 255, 255, .02);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 20px 22px;
+            margin-bottom: 16px;
+        }
+
+        .chat-msgs {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            margin-bottom: 14px;
+        }
+
+        .chat-msg {
+            max-width: 85%;
+            padding: 10px 14px;
+            border-radius: 12px;
+            font-size: 12.5px;
+            line-height: 1.6;
+        }
+
+        .chat-msg.bot {
+            background: rgba(201, 168, 76, .1);
+            color: #e2e8f0;
+            align-self: flex-start;
+            border: 1px solid rgba(201, 168, 76, .2);
+        }
+
+        .chat-msg.user {
+            background: rgba(99, 102, 241, .15);
+            color: #e2e8f0;
+            align-self: flex-end;
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input {
+            flex: 1;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #e2e8f0;
+            font-size: 13px;
+            outline: none;
+        }
+
+        .chat-input:focus {
+            border-color: rgba(201, 168, 76, .4);
+        }
+
+        .chat-send {
+            background: rgba(201, 168, 76, .15);
+            border: 1px solid rgba(201, 168, 76, .3);
+            color: #c9a84c;
+            border-radius: 10px;
+            padding: 10px 18px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .chat-send:hover {
+            background: rgba(201, 168, 76, .25);
+        }
+
+        .chat-send:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+        }
+
+        @media(max-width:900px) {
+            .ai-kpi {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .ai-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .ai-grid3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper">
+
+            <!-- Hero -->
+            <div class="ai-hero">
+                <div class="ai-hero-ico">🤖</div>
+                <div class="ai-hero-text">
+                    <h2>AI Wealth Advisor</h2>
+                    <p>Intelligent analysis of your financial health, risk profile and future projections — powered by
+                        ML</p>
+                </div>
+                <div class="ai-hero-score">
+                    <div class="big" id="heroScore">–</div>
+                    <div class="lbl">Financial Score</div>
+                </div>
+            </div>
+
+            <!-- KPI cards -->
+            <div class="ai-kpi">
+                <div class="ai-kpi-card">
+                    <div class="ai-kpi-lbl">Net Worth</div>
+                    <div class="ai-kpi-val" id="kNetWorth" style="color:#c9a84c">–</div>
+                    <div class="ai-kpi-bar">
+                        <div class="ai-kpi-bar-fill" id="bNetWorth" style="width:0%;background:#c9a84c"></div>
+                    </div>
+                </div>
+                <div class="ai-kpi-card">
+                    <div class="ai-kpi-lbl">Savings Rate</div>
+                    <div class="ai-kpi-val" id="kSavRate" style="color:#22c55e">–</div>
+                    <div class="ai-kpi-bar">
+                        <div class="ai-kpi-bar-fill" id="bSavRate" style="width:0%;background:#22c55e"></div>
+                    </div>
+                </div>
+                <div class="ai-kpi-card">
+                    <div class="ai-kpi-lbl">Expense Ratio</div>
+                    <div class="ai-kpi-val" id="kExpRatio" style="color:#f87171">–</div>
+                    <div class="ai-kpi-bar">
+                        <div class="ai-kpi-bar-fill" id="bExpRatio" style="width:0%;background:#f87171"></div>
+                    </div>
+                </div>
+                <div class="ai-kpi-card">
+                    <div class="ai-kpi-lbl">5-Year Projection</div>
+                    <div class="ai-kpi-val" id="kProjection" style="color:#63d1ff">–</div>
+                    <div class="ai-kpi-bar">
+                        <div class="ai-kpi-bar-fill" style="width:60%;background:#63d1ff"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Row 1: Risk + Projection timeline -->
+            <div class="ai-grid3">
+                <div class="ai-card">
+                    <div class="ai-card-title">📅 Wealth Projection</div>
+                    <div class="ai-card-sub">Estimated net worth growth over next 5 years</div>
+                    <div id="projList"></div>
+                </div>
+                <div class="ai-card">
+                    <div class="ai-card-title">⚡ Risk Assessment</div>
+                    <div class="ai-card-sub">Your current financial risk profile</div>
+                    <div id="riskBadge"></div>
+                    <div style="display:flex;flex-direction:column;gap:10px;" id="riskDetails"></div>
+                </div>
+            </div>
+
+            <!-- Row 2: AI Recommendations + Spending radar -->
+            <div class="ai-grid">
+                <div class="ai-card">
+                    <div class="ai-card-title">💡 AI Recommendations</div>
+                    <div class="ai-card-sub">Personalised actions to improve your financial health</div>
+                    <div class="rec-list" id="recList"></div>
+                </div>
+                <div class="ai-card">
+                    <div class="ai-card-title">📊 Spending Health Radar</div>
+                    <div class="ai-card-sub">Category-wise spending health</div>
+                    <div class="chart-wrap"><canvas id="radarChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Row 3: AI Chat -->
+            <div class="ai-chat-wrap">
+                <div class="ai-card-title">💬 Ask Your AI Advisor</div>
+                <div class="ai-card-sub" style="margin-bottom:14px;">Ask anything about your finances</div>
+                <div class="chat-msgs" id="chatMsgs">
+                    <div class="chat-msg bot">👋 Hi! I'm your AI financial advisor. Ask me anything — savings tips,
+                        investment advice, budget analysis or anything about your financial data.</div>
+                </div>
+                <div class="chat-input-row">
+                    <input class="chat-input" id="chatIn" placeholder="e.g. How can I save more this month?"
+                        onkeydown="if(event.key==='Enter')sendChat()">
+                    <button class="chat-send" id="chatBtn" onclick="sendChat()">Send →</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "/login";
+
+        const fmt = n => "₹" + Number(n).toLocaleString("en-IN");
+        let insightData = null;
+
+        async function load() {
+            const [insR, txnR] = await Promise.all([
+                fetch("/api/v1/advanced-insights", { headers: { Authorization: "Bearer " + token } }),
+                fetch("/api/v1/transactions-list", { headers: { Authorization: "Bearer " + token } }),
+            ]);
+            const d = await insR.json();
+            const txns = await txnR.json();
+            insightData = d;
+
+            const score = d.financial_score || 0;
+            const savRate = d.savings_rate ? (d.savings_rate * 100).toFixed(1) : 0;
+            const expRatio = d.expense_ratio ? (d.expense_ratio * 100).toFixed(1) : 0;
+
+            // Hero & KPIs
+            document.getElementById("heroScore").textContent = score + "/100";
+            document.getElementById("kNetWorth").textContent = fmt(d.net_worth || 0);
+            document.getElementById("kSavRate").textContent = savRate + "%";
+            document.getElementById("kExpRatio").textContent = expRatio + "%";
+            document.getElementById("kProjection").textContent = fmt(d.future_projection_5yr || 0);
+            setTimeout(() => {
+                document.getElementById("bSavRate").style.width = Math.min(savRate, 100) + "%";
+                document.getElementById("bExpRatio").style.width = Math.min(expRatio, 100) + "%";
+                document.getElementById("bNetWorth").style.width = "70%";
+            }, 300);
+
+            // Projection timeline
+            const netWorth = d.net_worth || 0;
+            const monthly = txns.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0) -
+                txns.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+            const maxProj = netWorth + monthly * 12 * 5;
+            const projs = [1, 2, 3, 4, 5].map(y => ({ year: new Date().getFullYear() + y, val: netWorth + monthly * 12 * y }));
+            document.getElementById("projList").innerHTML = projs.map(p => `
+        <div class="proj-row">
+            <span class="proj-year">${p.year}</span>
+            <div class="proj-bar-wrap"><div class="proj-bar-fill" style="width:${maxProj > 0 ? Math.max((p.val / maxProj * 100), 5).toFixed(0) : 10}%"></div></div>
+            <span class="proj-val">${fmt(Math.max(p.val, 0))}</span>
+        </div>`).join("");
+
+            // Risk
+            const risk = (d.risk_level || "medium").toLowerCase();
+            const rClass = risk.includes("low") ? "risk-low" : risk.includes("high") ? "risk-high" : "risk-medium";
+            const rEmoji = risk.includes("low") ? "🟢" : risk.includes("high") ? "🔴" : "🟡";
+            document.getElementById("riskBadge").innerHTML = `<div class="risk-badge ${rClass}">${rEmoji} ${d.risk_level || "Moderate"} Risk</div>`;
+            document.getElementById("riskDetails").innerHTML = [
+                ["Safe Expense Limit", fmt(d.safe_expense_limit || 0)],
+                ["Savings Rate", savRate + "%"],
+                ["Expense Ratio", expRatio + "%"],
+                ["Financial Score", score + "/100"],
+            ].map(([l, v]) => `
+        <div style="display:flex;justify-content:space-between;font-size:12px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05);">
+            <span style="color:#475569;">${l}</span>
+            <span style="font-weight:700;color:#94a3b8;">${v}</span>
+        </div>`).join("");
+
+            // Recommendations
+            const icons = ["💰", "📊", "🚨", "💡", "📈", "🎯", "⚠️", "✅"];
+            const tags = { savings: "SAVINGS", expense: "SPENDING", risk: "RISK ALERT", other: "TIP" };
+            const recs = d.suggestions || [];
+            document.getElementById("recList").innerHTML = recs.length
+                ? recs.map((r, i) => {
+                    const ico = icons[i % icons.length];
+                    const tag = r.toLowerCase().includes("risk") ? "risk" : r.toLowerCase().includes("save") || r.toLowerCase().includes("saving") ? "savings" : "other";
+                    const tagColors = { savings: "background:rgba(34,197,94,.12);color:#22c55e", risk: "background:rgba(248,113,113,.12);color:#f87171", other: "background:rgba(201,168,76,.12);color:#c9a84c" };
+                    return `<div class="rec-card">
+                <div class="rec-ico">${ico}</div>
+                <div>
+                    <div class="rec-tag" style="${tagColors[tag]}">${tags[tag] || "TIP"}</div>
+                    <div class="rec-text">${r}</div>
+                </div>
+            </div>`;
+                }).join("")
+                : `<div class="rec-card"><div class="rec-ico">✅</div><div class="rec-text">Your finances look healthy! Keep it up.</div></div>`;
+
+            // Spending radar
+            const catTotals = {};
+            txns.filter(t => t.type === "expense").forEach(t => { catTotals[t.category] = (catTotals[t.category] || 0) + t.amount; });
+            const topCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]).slice(0, 6);
+            const totalExp = Object.values(catTotals).reduce((s, v) => s + v, 0);
+            new Chart(document.getElementById("radarChart"), {
+                type: "radar",
+                data: {
+                    labels: topCats.map(c => c[0]),
+                    datasets: [{
+                        label: "Spending %",
+                        data: topCats.map(c => totalExp > 0 ? (c[1] / totalExp * 100).toFixed(1) : 0),
+                        backgroundColor: "rgba(201,168,76,.15)", borderColor: "#c9a84c",
+                        pointBackgroundColor: "#c9a84c", pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: { r: { ticks: { color: "#475569", font: { size: 9 }, backdropColor: "transparent" }, grid: { color: "rgba(255,255,255,.06)" }, pointLabels: { color: "#94a3b8", font: { size: 10 } } } },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        // AI Chat
+        async function sendChat() {
+            const input = document.getElementById("chatIn");
+            const btn = document.getElementById("chatBtn");
+            const msgs = document.getElementById("chatMsgs");
+            const q = input.value.trim();
+            if (!q) return;
+
+            // Add user message
+            msgs.innerHTML += `<div class="chat-msg user">${q}</div>`;
+            input.value = "";
+            btn.disabled = true;
+            btn.textContent = "…";
+            msgs.scrollTop = msgs.scrollHeight;
+
+            // Build context from insight data
+            const ctx = insightData ? `User financial context: Financial Score=${insightData.financial_score}/100, Net Worth=₹${insightData.net_worth}, Savings Rate=${insightData.savings_rate ? (insightData.savings_rate * 100).toFixed(1) + "%" : "unknown"}, Risk=${insightData.risk_level}. ` : "";
+
+            try {
+                const res = await fetch("/api/v1/ai-bot", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+                    body: JSON.stringify({ message: ctx + q, history: [] })
+                });
+                const data = await res.json();
+                const reply = data.reply || data.response || data.message || "I couldn't process that. Try again.";
+                msgs.innerHTML += `<div class="chat-msg bot">${reply}</div>`;
+            } catch (e) {
+                msgs.innerHTML += `<div class="chat-msg bot">⚠️ Could not connect. Please try again.</div>`;
+            }
+
+            btn.disabled = false;
+            btn.textContent = "Send →";
+            msgs.scrollTop = msgs.scrollHeight;
+        }
+
+        document.addEventListener("DOMContentLoaded", load);
+    </script>
+</body>
+
+</html>

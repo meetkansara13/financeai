@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Smart Budget — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/app.js"></script>
+    <style>
+        :root {
+            --gold: #c9a84c;
+            --gold-dim: rgba(201, 168, 76, 0.1);
+            --gold-glow: rgba(201, 168, 76, 0.2);
+            --green: #22c55e;
+            --red: #f87171;
+            --amber: #f59e0b;
+            --cyan: #63d1ff;
+            --purple: #a78bfa;
+            --border: rgba(255, 255, 255, 0.07);
+            --text: #e2e8f0;
+            --muted: #475569;
+            --sub: #64748b;
+            --card: rgba(14, 18, 28, 0.8);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        .page-wrapper {
+            padding: 32px 44px;
+            flex: 1;
+            overflow-y: auto;
+            min-width: 0;
+        }
+
+        .page-header {
+            margin-bottom: 20px;
+        }
+
+        .page-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .page-header p {
+            font-size: 12.5px;
+            color: var(--sub);
+            margin-top: 3px;
+        }
+
+        .top-bar {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .msel {
+            padding: 9px 13px;
+            background: rgba(30, 41, 59, .8);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        .ai-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            background: rgba(167, 139, 250, .12);
+            border: 1px solid rgba(167, 139, 250, .25);
+            color: var(--purple);
+        }
+
+        .btn-add {
+            padding: 9px 16px;
+            background: linear-gradient(135deg, var(--gold), #e8c872);
+            color: #0d0b04;
+            border: none;
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform .15s;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-auto {
+            padding: 9px 15px;
+            background: rgba(99, 209, 255, .08);
+            color: var(--cyan);
+            border: 1px solid rgba(99, 209, 255, .18);
+            border-radius: 9px;
+            font-size: 12.5px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .btn-auto:hover {
+            background: rgba(99, 209, 255, .14);
+        }
+
+        .kpi-strip {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .kc {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 15px 17px;
+        }
+
+        .kc-lbl {
+            font-size: 10px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            margin-bottom: 5px;
+        }
+
+        .kc-val {
+            font-size: 19px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .kc-val.g {
+            color: var(--green)
+        }
+
+        .kc-val.r {
+            color: var(--red)
+        }
+
+        .kc-val.gold {
+            color: var(--gold)
+        }
+
+        .setup-banner {
+            background: linear-gradient(135deg, rgba(201, 168, 76, .08), rgba(99, 209, 255, .05));
+            border: 1px solid rgba(201, 168, 76, .22);
+            border-radius: 16px;
+            padding: 26px 30px;
+            margin-bottom: 20px;
+        }
+
+        .sb-head {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .sb-icon {
+            font-size: 28px;
+        }
+
+        .sb-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .sb-desc {
+            font-size: 12px;
+            color: var(--sub);
+            margin-top: 2px;
+        }
+
+        .sb-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 13px;
+            margin-bottom: 18px;
+        }
+
+        .sb-field label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .pfx-wrap {
+            position: relative;
+        }
+
+        .pfx {
+            position: absolute;
+            left: 11px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--sub);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        .sb-input {
+            width: 100%;
+            padding: 10px 13px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .sb-input.pl {
+            padding-left: 25px;
+        }
+
+        .sb-input:focus {
+            border-color: rgba(201, 168, 76, .4);
+        }
+
+        .sb-input::placeholder {
+            color: var(--muted);
+        }
+
+        .btn-gen {
+            padding: 11px 28px;
+            background: linear-gradient(135deg, var(--gold), #e8c872);
+            color: #0d0b04;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 4px 16px var(--gold-glow);
+            transition: transform .15s;
+        }
+
+        .btn-gen:hover {
+            transform: translateY(-1px);
+        }
+
+        .budget-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .bcard {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 17px 19px;
+            transition: border-color .2s;
+            position: relative;
+        }
+
+        .bcard:hover {
+            border-color: rgba(201, 168, 76, .2);
+        }
+
+        .bcard-head {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 13px;
+        }
+
+        .bc-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 8px;
+            background: var(--gold-dim);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .bc-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .bc-status {
+            font-size: 11px;
+            color: var(--sub);
+            margin-top: 1px;
+        }
+
+        .bc-amounts {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 8px;
+        }
+
+        .bc-amounts strong {
+            color: var(--text);
+            font-size: 12.5px;
+        }
+
+        .prog {
+            height: 6px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 6px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width .9s cubic-bezier(.4, 0, .2, 1);
+        }
+
+        .bc-foot {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .pct-lbl {
+            font-size: 11.5px;
+            font-weight: 700;
+        }
+
+        .chip {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 12px;
+        }
+
+        .chip-g {
+            background: rgba(34, 197, 94, .1);
+            color: var(--green);
+            border: 1px solid rgba(34, 197, 94, .2);
+        }
+
+        .chip-a {
+            background: rgba(245, 158, 11, .1);
+            color: var(--amber);
+            border: 1px solid rgba(245, 158, 11, .2);
+        }
+
+        .chip-r {
+            background: rgba(248, 113, 113, .1);
+            color: var(--red);
+            border: 1px solid rgba(248, 113, 113, .2);
+        }
+
+        .bc-edit {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: none;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--muted);
+            font-size: 11px;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: all .15s;
+        }
+
+        .bc-edit:hover {
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
+        .bc-note {
+            font-size: 11px;
+            margin-top: 8px;
+            padding: 5px 10px;
+            border-radius: 7px;
+        }
+
+        .bc-note.ok {
+            background: rgba(34, 197, 94, .07);
+            color: var(--green);
+        }
+
+        .bc-note.warn {
+            background: rgba(245, 158, 11, .07);
+            color: var(--amber);
+        }
+
+        .bc-note.over {
+            background: rgba(248, 113, 113, .07);
+            color: var(--red);
+        }
+
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .cpanel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 20px;
+        }
+
+        .cpanel h3 {
+            font-size: 12.5px;
+            color: var(--sub);
+            font-weight: 600;
+            margin-bottom: 13px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 260px;
+            width: 100%;
+        }
+
+        .ai-tips {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .sec-head {
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            margin-bottom: 14px;
+        }
+
+        .sec-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .sec-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: rgba(201, 168, 76, .12);
+            color: var(--gold);
+            border: 1px solid rgba(201, 168, 76, .2);
+        }
+
+        .tips-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 11px;
+        }
+
+        .tip-card {
+            background: rgba(255, 255, 255, .025);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 13px;
+        }
+
+        .tip-icon {
+            font-size: 17px;
+            margin-bottom: 5px;
+        }
+
+        .tip-title {
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .tip-body {
+            font-size: 11.5px;
+            color: var(--sub);
+            line-height: 1.6;
+        }
+
+        .invest-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .invest-desc {
+            font-size: 12px;
+            color: var(--sub);
+            margin-bottom: 14px;
+        }
+
+        .invest-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 11px;
+        }
+
+        .inv-card {
+            background: rgba(255, 255, 255, .025);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 13px;
+            text-align: center;
+            transition: border-color .2s;
+        }
+
+        .inv-card:hover {
+            border-color: rgba(201, 168, 76, .2);
+        }
+
+        .inv-ico {
+            font-size: 22px;
+            margin-bottom: 5px;
+        }
+
+        .inv-name {
+            font-size: 11px;
+            color: var(--sub);
+        }
+
+        .inv-val {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin: 3px 0;
+        }
+
+        .inv-chg {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .inv-chg.up {
+            color: var(--green);
+        }
+
+        .inv-chg.dn {
+            color: var(--red);
+        }
+
+        .inv-rec {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 2px 9px;
+            border-radius: 10px;
+            margin-top: 5px;
+            display: inline-block;
+        }
+
+        .rec-buy {
+            background: rgba(34, 197, 94, .1);
+            color: var(--green);
+        }
+
+        .rec-hold {
+            background: rgba(245, 158, 11, .1);
+            color: var(--amber);
+        }
+
+        .rec-wait {
+            background: rgba(100, 116, 139, .1);
+            color: var(--sub);
+        }
+
+        .inv-note {
+            font-size: 10.5px;
+            color: var(--sub);
+            margin-top: 5px;
+            line-height: 1.5;
+        }
+
+        .goals-panel {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 13px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .goals-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 11px;
+            margin-top: 14px;
+        }
+
+        .goal-card {
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            padding: 13px;
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .goal-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text);
+            margin-bottom: 3px;
+        }
+
+        .goal-amt {
+            font-size: 12px;
+            color: var(--sub);
+            margin-bottom: 7px;
+        }
+
+        .goal-months {
+            font-size: 11px;
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .65);
+            z-index: 200;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #0e1118;
+            border: 1px solid rgba(201, 168, 76, .22);
+            border-radius: 15px;
+            padding: 26px;
+            width: 390px;
+            animation: fadeUp .3s ease;
+        }
+
+        .modal-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 16px;
+        }
+
+        .mf {
+            margin-bottom: 12px;
+        }
+
+        .mf label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--sub);
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        .mi {
+            width: 100%;
+            padding: 10px 13px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid var(--border);
+            border-radius: 9px;
+            color: var(--text);
+            font-size: 13px;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .mi:focus {
+            border-color: rgba(201, 168, 76, .4);
+        }
+
+        .modal-acts {
+            display: flex;
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .btn-c {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border);
+            background: none;
+            color: var(--sub);
+            border-radius: 9px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .btn-s {
+            flex: 1;
+            padding: 10px;
+            background: linear-gradient(135deg, var(--gold), #e8c872);
+            color: #0d0b04;
+            border: none;
+            border-radius: 9px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+        }
+
+        .toast {
+            position: fixed;
+            top: 22px;
+            right: 22px;
+            z-index: 999;
+            padding: 12px 20px;
+            border-radius: 11px;
+            font-size: 13px;
+            font-weight: 500;
+            box-shadow: 0 8px 28px rgba(0, 0, 0, .4);
+            display: none;
+        }
+
+        .toast.show {
+            display: block;
+            animation: fadeUp .3s ease;
+        }
+
+        .toast.ok {
+            background: rgba(21, 128, 61, .95);
+            border: 1px solid rgba(34, 197, 94, .3);
+            color: #fff;
+        }
+
+        .toast.err {
+            background: rgba(127, 29, 29, .95);
+            border: 1px solid rgba(248, 113, 113, .3);
+            color: #fff;
+        }
+
+        .toast.info {
+            background: rgba(30, 58, 138, .95);
+            border: 1px solid rgba(99, 209, 255, .3);
+            color: #fff;
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px)
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0)
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper">
+            <div class="topnav">
+                <div class="logo">FinanceAI</div><input class="search-box" placeholder="Search..." />
+            </div>
+
+            <div class="page-header">
+                <h1>Smart Budget Planner</h1>
+                <p>AI-powered budgeting · Auto-detects patterns · Investment intelligence</p>
+            </div>
+
+            <div class="top-bar">
+                <select class="msel" id="monthSel" onchange="onMonthChange()">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <select class="msel" id="yearSel" onchange="onMonthChange()">
+                    <option value="2025">2025</option>
+                    <option value="2026">2026</option>
+                </select>
+                <span class="ai-pill" id="autoBadge" style="display:none;">⚡ AI Auto-Generated</span>
+                <button class="btn-auto" onclick="autoGenerate()">🤖 Auto-Generate from Transactions</button>
+                <button class="btn-add" onclick="openModal()">＋ Add Category</button>
+            </div>
+
+            <div class="kpi-strip">
+                <div class="kc">
+                    <div class="kc-lbl">Monthly Income</div>
+                    <div class="kc-val g" id="kIncome">₹—</div>
+                </div>
+                <div class="kc">
+                    <div class="kc-lbl">Total Budgeted</div>
+                    <div class="kc-val gold" id="kBudget">₹—</div>
+                </div>
+                <div class="kc">
+                    <div class="kc-lbl">Total Spent</div>
+                    <div class="kc-val" id="kSpent">₹—</div>
+                </div>
+                <div class="kc">
+                    <div class="kc-lbl">Remaining</div>
+                    <div class="kc-val" id="kRemain">₹—</div>
+                </div>
+                <div class="kc">
+                    <div class="kc-lbl">Savings Rate</div>
+                    <div class="kc-val" id="kSaving">—%</div>
+                </div>
+            </div>
+
+            <!-- First-time Banner -->
+            <div class="setup-banner" id="setupBanner" style="display:none;">
+                <div class="sb-head">
+                    <div class="sb-icon">🤖</div>
+                    <div>
+                        <div class="sb-title">First time here? Let's build your smart budget.</div>
+                        <div class="sb-desc">We'll scan your transaction history and auto-build a realistic budget plan.
+                        </div>
+                    </div>
+                </div>
+                <div class="sb-grid">
+                    <div class="sb-field">
+                        <label>Monthly Income <span style="color:#f87171">*</span></label>
+                        <div class="pfx-wrap"><span class="pfx">₹</span>
+                            <input class="sb-input pl" id="siIncome" type="number" placeholder="85000" />
+                        </div>
+                    </div>
+                    <div class="sb-field">
+                        <label>Savings Goal %</label>
+                        <input class="sb-input" id="siSaving" type="number" placeholder="30" min="0" max="80" />
+                    </div>
+                    <div class="sb-field">
+                        <label>Fixed Cost (Rent etc.)</label>
+                        <div class="pfx-wrap"><span class="pfx">₹</span>
+                            <input class="sb-input pl" id="siRent" type="number" placeholder="15000" />
+                        </div>
+                    </div>
+                </div>
+                <button class="btn-gen" onclick="generateFirstBudget()">⚡ Generate My Budget Plan</button>
+            </div>
+
+            <div class="budget-grid" id="budgetGrid"></div>
+
+            <div class="chart-row" id="chartRow" style="display:none;">
+                <div class="cpanel">
+                    <h3>🍩 Budget Allocation</h3>
+                    <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+                </div>
+                <div class="cpanel">
+                    <h3>📊 Spent vs Limit</h3>
+                    <div class="chart-wrap"><canvas id="barChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="ai-tips" id="aiTipsPanel" style="display:none;">
+                <div class="sec-head">
+                    <span style="font-size:19px;">💡</span>
+                    <span class="sec-title">AI Financial Insights</span>
+                    <span class="sec-badge">Personalized</span>
+                </div>
+                <div class="tips-grid" id="tipsGrid"></div>
+            </div>
+
+            <div class="invest-panel">
+                <div class="sec-head">
+                    <span style="font-size:19px;">📈</span>
+                    <span class="sec-title">Investment Pulse</span>
+                    <span class="sec-badge">Smart Signals</span>
+                </div>
+                <div class="invest-desc">Where to put your savings — based on your savings rate and financial goals.
+                </div>
+                <div class="invest-grid" id="investGrid"></div>
+            </div>
+
+            <div class="goals-panel" id="goalsPanel" style="display:none;">
+                <div class="sec-head">
+                    <span style="font-size:19px;">🎯</span>
+                    <span class="sec-title">Financial Goal Planner</span>
+                </div>
+                <div class="goals-grid" id="goalsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="budgetModal">
+        <div class="modal-box">
+            <div class="modal-title" id="modalTitle">Add Budget Category</div>
+            <div class="mf"><label>Category</label><input class="mi" id="mCat" placeholder="e.g. groceries" /></div>
+            <div class="mf"><label>Monthly Limit (₹)</label><input class="mi" id="mLimit" type="number"
+                    placeholder="8000" /></div>
+            <div class="modal-acts">
+                <button class="btn-c" onclick="closeModal()">Cancel</button>
+                <button class="btn-s" onclick="saveModal()">Save</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <script src="/static/js/budgets.js?v=10"></script>
+</body>
+
+</html>

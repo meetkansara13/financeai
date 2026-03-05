@@ -1,0 +1,132 @@
+<aside class="sidebar" id="appSidebar">
+
+    <!-- Logo -->
+    <div class="sidebar-logo">
+        <div class="sidebar-logo-icon">💹</div>
+        <span class="sidebar-logo-text">Finance<em>AI</em></span>
+    </div>
+
+    <!-- User badge -->
+    <div class="sidebar-user">
+        <div class="user-avatar" id="sidebarAvatar">U</div>
+        <div class="user-info">
+            <div class="user-name" id="sidebarUserName">Loading...</div>
+            <div class="user-tag">Pro Account</div>
+        </div>
+        <div class="user-status-dot"></div>
+    </div>
+
+    <!-- Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Navigation -->
+    <nav class="sidebar-nav">
+        <p class="nav-section-label">MAIN MENU</p>
+        <ul class="nav-links">
+            <li>
+                <a href="/dashboard" class="nav-item" data-page="dashboard">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="3" width="7" height="7" />
+                            <rect x="14" y="3" width="7" height="7" />
+                            <rect x="14" y="14" width="7" height="7" />
+                            <rect x="3" y="14" width="7" height="7" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">Dashboard</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/analytics" class="nav-item" data-page="analytics">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">Analytics</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/transactions" class="nav-item" data-page="transactions">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <line x1="12" y1="1" x2="12" y2="23" />
+                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">Transactions</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/budgets" class="nav-item" data-page="budgets">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <path
+                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">Budgets</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+        </ul>
+
+        <p class="nav-section-label" style="margin-top:20px;">INTELLIGENCE</p>
+        <ul class="nav-links">
+            <li>
+                <a href="/ai" class="nav-item" data-page="ai">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 8v4l3 3" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">AI Insights</span>
+                    <span class="nav-badge">AI</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+            <li>
+                <a href="/wealth" class="nav-item" data-page="wealth">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round" stroke-linejoin="round">
+                            <polygon
+                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                        </svg>
+                    </span>
+                    <span class="nav-label">Wealth Planner</span>
+                    <span class="nav-pip"></span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Spacer -->
+    <div style="flex:1"></div>
+
+    <!-- Divider -->
+    <div class="sidebar-divider"></div>
+
+    <!-- Logout -->
+    <button class="sidebar-logout" onclick="logout()">
+        <span class="logout-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                stroke-linejoin="round">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                <polyline points="16 17 21 12 16 7" />
+                <line x1="21" y1="12" x2="9" y2="12" />
+            </svg>
+        </span>
+        <span>Logout</span>
+    </button>
+
+</aside>

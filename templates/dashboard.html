@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Dashboard — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=10">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="/static/js/app.js"></script>
+    <style>
+        .smart-bar {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            background: rgba(201, 168, 76, 0.07);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            border-radius: 14px;
+            padding: 14px 20px;
+            margin-bottom: 16px;
+        }
+
+        .smart-bar-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .smart-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #e2e8f0;
+            font-size: 14.5px;
+            font-family: 'DM Sans', sans-serif;
+        }
+
+        .smart-input::placeholder {
+            color: #475569;
+        }
+
+        .smart-send-btn {
+            padding: 8px 18px;
+            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            border: none;
+            border-radius: 8px;
+            color: #0e0c06;
+            font-weight: 700;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: 'DM Sans', sans-serif;
+            transition: transform 0.15s, box-shadow 0.15s;
+        }
+
+        .smart-send-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 14px rgba(201, 168, 76, 0.3);
+        }
+
+        .smart-feedback {
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-size: 13px;
+            margin-bottom: 16px;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .smart-feedback.show {
+            display: flex;
+        }
+
+        .smart-feedback.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            color: #22c55e;
+        }
+
+        .smart-feedback.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.25);
+            color: #f59e0b;
+        }
+
+        .smart-feedback.danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: #ef4444;
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+        }
+
+        .month-select {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: #e2e8f0;
+            padding: 8px 14px;
+            border-radius: 9px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 6px;
+        }
+
+        .view-btn {
+            padding: 8px 18px;
+            border-radius: 9px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.04);
+            color: #64748b;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            color: #0e0c06;
+            font-weight: 700;
+            border-color: transparent;
+        }
+
+        .prediction-strip {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 18px;
+            background: rgba(99, 209, 255, 0.05);
+            border: 1px solid rgba(99, 209, 255, 0.12);
+            border-radius: 10px;
+            margin-bottom: 22px;
+            font-size: 13px;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pred-label {
+            color: #64748b;
+        }
+
+        .pred-value {
+            color: #63d1ff;
+            font-weight: 700;
+            font-size: 15px;
+        }
+
+        .pred-msg {
+            color: #94a3b8;
+            font-size: 12.5px;
+            flex: 1;
+            text-align: right;
+        }
+
+        .charts-row {
+            display: grid;
+            grid-template-columns: 1fr 320px;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .chart-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 22px;
+        }
+
+        .chart-card h3 {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+            margin-bottom: 16px;
+        }
+
+        .chart-container {
+            height: 260px;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+            margin-bottom: 22px;
+        }
+
+        .txn-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+        }
+
+        .txn-item:last-child {
+            border-bottom: none;
+        }
+
+        .txn-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .txn-icon {
+            width: 30px;
+            height: 30px;
+            border-radius: 7px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            background: rgba(255, 255, 255, 0.05);
+            flex-shrink: 0;
+        }
+
+        .txn-cat {
+            font-weight: 500;
+            color: #e2e8f0;
+            text-transform: capitalize;
+        }
+
+        .txn-date {
+            font-size: 10.5px;
+            color: #475569;
+        }
+
+        .txn-amount.income {
+            color: #22c55e;
+            font-weight: 700;
+        }
+
+        .txn-amount.expense {
+            color: #f87171;
+            font-weight: 700;
+        }
+
+        .budget-item {
+            margin-bottom: 14px;
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            margin-bottom: 5px;
+        }
+
+        .budget-cat {
+            font-weight: 600;
+            color: #e2e8f0;
+            text-transform: capitalize;
+        }
+
+        .budget-pct {
+            color: #64748b;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+
+        /* ── AI Bot ── */
+        .bot-panel {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(201, 168, 76, 0.15);
+            border-radius: 16px;
+            padding: 22px;
+            margin-bottom: 24px;
+        }
+
+        .bot-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .bot-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+        }
+
+        .bot-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .bot-subtitle {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .bot-messages {
+            min-height: 200px;
+            max-height: 260px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-right: 2px;
+        }
+
+        .bot-messages::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .bot-messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 2px;
+        }
+
+        .msg {
+            max-width: 85%;
+            padding: 9px 13px;
+            border-radius: 12px;
+            font-size: 13px;
+            line-height: 1.55;
+            animation: fadeUp 0.25s ease;
+        }
+
+        .msg.user {
+            align-self: flex-end;
+            background: rgba(201, 168, 76, 0.14);
+            border: 1px solid rgba(201, 168, 76, 0.2);
+            color: #e8c872;
+        }
+
+        .msg.bot {
+            align-self: flex-start;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            color: #e2e8f0;
+        }
+
+        .msg.typing {
+            color: #475569;
+            font-style: italic;
+        }
+
+        .bot-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        .bot-input {
+            flex: 1;
+            padding: 10px 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 9px;
+            color: #e2e8f0;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 13px;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .bot-input:focus {
+            border-color: rgba(201, 168, 76, 0.35);
+        }
+
+        .bot-input::placeholder {
+            color: #3d4860;
+        }
+
+        .bot-send {
+            padding: 10px 16px;
+            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            border: none;
+            border-radius: 9px;
+            color: #0e0c06;
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: transform 0.15s;
+        }
+
+        .bot-send:hover {
+            transform: scale(1.06);
+        }
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Category icon colors */
+        .ci-food {
+            background: rgba(239, 68, 68, 0.15);
+        }
+
+        .ci-transport {
+            background: rgba(99, 209, 255, 0.12);
+        }
+
+        .ci-shopping {
+            background: rgba(167, 139, 250, 0.15);
+        }
+
+        .ci-entertainment {
+            background: rgba(251, 191, 36, 0.12);
+        }
+
+        .ci-sports {
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .ci-health {
+            background: rgba(244, 114, 182, 0.12);
+        }
+
+        .ci-utilities {
+            background: rgba(148, 163, 184, 0.1);
+        }
+
+        .ci-assets {
+            background: rgba(201, 168, 76, 0.15);
+        }
+
+        .ci-income {
+            background: rgba(34, 197, 94, 0.12);
+        }
+
+        .ci-other {
+            background: rgba(255, 255, 255, 0.05);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+
+        {% include "sidebar.html" %}
+
+        <div class="page-wrapper">
+
+            <div class="topnav">
+                <div class="logo">FinanceAI</div>
+                <input class="search-box" placeholder="Search transactions..." id="searchBox" />
+            </div>
+
+            <div class="page-header">
+                <h1>Revenue Command Center</h1>
+                <p>Real-time financial intelligence & AI decision engine.</p>
+            </div>
+
+            <!-- SMART BAR -->
+            <div class="smart-bar">
+                <span class="smart-bar-icon">⚡</span>
+                <input type="text" id="smartInput" class="smart-input"
+                    placeholder="e.g. 'Paid 500 for swiggy' · 'Received 20000 salary' · 'Bought gold 10000'" />
+                <button class="smart-send-btn" onclick="submitSmartTransaction()">Add →</button>
+            </div>
+            <div class="smart-feedback" id="smartFeedback"></div>
+
+            <!-- CONTROLS -->
+            <div class="controls-row">
+                <select class="month-select" id="monthSelector" onchange="loadDashboard()">
+                    <option value="1">January</option>
+                    <option value="2">February</option>
+                    <option value="3">March</option>
+                    <option value="4">April</option>
+                    <option value="5">May</option>
+                    <option value="6">June</option>
+                    <option value="7">July</option>
+                    <option value="8">August</option>
+                    <option value="9">September</option>
+                    <option value="10">October</option>
+                    <option value="11">November</option>
+                    <option value="12">December</option>
+                </select>
+                <div class="view-toggle">
+                    <button class="view-btn active" id="monthlyBtn" onclick="setView('monthly')">Monthly</button>
+                    <button class="view-btn" id="overallBtn" onclick="setView('overall')">Overall</button>
+                </div>
+            </div>
+
+            <!-- PREDICTION STRIP -->
+            <div class="prediction-strip">
+                <span class="pred-label">🔮 Month-end Savings Forecast</span>
+                <span class="pred-value" id="predictionValue">₹—</span>
+                <span class="pred-msg" id="predictionMsg">Calculating...</span>
+            </div>
+
+            <!-- KPI GRID -->
+            <div class="kpi-grid" style="margin-bottom:22px;">
+                <div class="kpi-card">
+                    <h4 id="kpi1Title">Monthly Income</h4>
+                    <h2 id="kpi1Value">₹0</h2>
+                </div>
+                <div class="kpi-card">
+                    <h4 id="kpi2Title">Monthly Expense</h4>
+                    <h2 id="kpi2Value">₹0</h2>
+                </div>
+                <div class="kpi-card">
+                    <h4 id="kpi3Title">Savings</h4>
+                    <h2 id="kpi3Value">₹0</h2>
+                </div>
+                <div class="kpi-card highlight">
+                    <h4 id="kpi4Title">Net Worth</h4>
+                    <h2 id="kpi4Value">₹0</h2>
+                </div>
+            </div>
+
+            <!-- CHARTS -->
+            <div class="charts-row">
+                <div class="chart-card">
+                    <h3>📈 Income vs Expense Trend</h3>
+                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3>🍩 Expense by Category</h3>
+                    <div class="chart-container"><canvas id="donutChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- BOTTOM ROW -->
+            <div class="bottom-row">
+                <div class="chart-card">
+                    <h3>🕐 Recent Transactions</h3>
+                    <div id="historyList"></div>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 Budget Status</h3>
+                    <div id="budgetList"></div>
+                </div>
+            </div>
+
+            <!-- NEWS INSIGHTS WIDGET -->
+            <div class="bot-panel" id="newsInsightsPanel" style="margin-bottom:20px;">
+                <div class="bot-header">
+                    <div class="bot-avatar">📰</div>
+                    <div>
+                        <div class="bot-title">Live News Financial Insights</div>
+                        <div class="bot-subtitle" id="newsFetchedAt">Powered by Indian Finance News · Loading...</div>
+                    </div>
+                </div>
+                <div id="newsInsightsList" style="padding: 8px 0;">
+                    <div style="color:#888; font-size:13px; padding:10px;">Fetching latest news insights...</div>
+                </div>
+            </div>
+
+            <!-- AI BOT -->
+            <div class="bot-panel">
+                <div class="bot-header">
+                    <div class="bot-avatar">🤖</div>
+                    <div>
+                        <div class="bot-title">FinanceAI Advisor</div>
+                        <div class="bot-subtitle">Powered by Groq AI · Has your full financial context</div>
+                    </div>
+                </div>
+                <div class="bot-messages" id="botMessages">
+                    <div class="msg bot">👋 Hi! I'm your personal AI finance advisor. I know your income, expenses,
+                        assets, budgets and net worth. Ask me anything — "Can I buy a ₹25,000 phone?", "Should I invest
+                        in gold now?", "How do I improve my savings rate?"</div>
+                </div>
+                <div class="bot-input-row">
+                    <input type="text" class="bot-input" id="botInput"
+                        placeholder="Ask about your finances, investments, budgets..." />
+                    <button class="bot-send" onclick="sendBotMessage()">➤</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="/static/js/dashboard.js?v=10"></script>
+</body>
+
+</html>

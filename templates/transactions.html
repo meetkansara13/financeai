@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Transactions — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
+    <script src="/static/js/app.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+        rel="stylesheet">
+    <style>
+        body,
+        * {
+            font-family: 'DM Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .page-wrapper {
+            padding: 24px 28px;
+        }
+
+        /* ── Top bar ── */
+        .txn-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 22px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .txn-topbar h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0f4ff;
+            margin: 0;
+        }
+
+        .txn-topbar p {
+            font-size: 12px;
+            color: #475569;
+            margin: 2px 0 0;
+        }
+
+        .search-wrap {
+            position: relative;
+        }
+
+        .search-wrap input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 9px 14px 9px 38px;
+            color: #e2e8f0;
+            font-size: 13px;
+            width: 230px;
+            outline: none;
+        }
+
+        .search-wrap input::placeholder {
+            color: #475569;
+        }
+
+        .search-wrap input:focus {
+            border-color: rgba(201, 168, 76, 0.5);
+        }
+
+        .search-wrap::before {
+            content: "🔍";
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 13px;
+            pointer-events: none;
+        }
+
+        /* ── Summary strip ── */
+        .sum-strip {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .sum-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 14px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: border-color .2s;
+        }
+
+        .sum-card:hover {
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .sum-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .sum-lbl {
+            font-size: 10.5px;
+            color: #475569;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .sum-val {
+            font-size: 16px;
+            font-weight: 700;
+            margin-top: 3px;
+        }
+
+        /* ── Month nav + pills row ── */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mnav-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 5px 13px;
+            font-size: 18px;
+            line-height: 1;
+            transition: all .2s;
+        }
+
+        .mnav-btn:hover {
+            color: #c9a84c;
+            border-color: rgba(201, 168, 76, 0.3);
+        }
+
+        .mnav-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #c9a84c;
+            min-width: 130px;
+            text-align: center;
+        }
+
+        .pills {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .pill {
+            padding: 5px 13px;
+            border-radius: 20px;
+            font-size: 11.5px;
+            font-weight: 600;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.03);
+            color: #64748b;
+            cursor: pointer;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .pill.active {
+            background: rgba(201, 168, 76, 0.13);
+            border-color: rgba(201, 168, 76, 0.35);
+            color: #c9a84c;
+        }
+
+        .pill:hover:not(.active) {
+            color: #94a3b8;
+        }
+
+        /* ── Date group ── */
+        .date-group {
+            margin-bottom: 4px;
+        }
+
+        .date-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 2px 6px;
+        }
+
+        .date-text {
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .6px;
+            white-space: nowrap;
+        }
+
+        .date-line {
+            flex: 1;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .date-net {
+            font-size: 11px;
+            color: #475569;
+            white-space: nowrap;
+        }
+
+        /* ── Transaction row ── */
+        .txn-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            margin-bottom: 5px;
+            background: rgba(255, 255, 255, 0.025);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 13px;
+            cursor: default;
+            transition: all .18s;
+        }
+
+        .txn-row:hover {
+            background: rgba(255, 255, 255, 0.048);
+            transform: translateX(3px);
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .txn-row.deleting {
+            opacity: .3;
+            pointer-events: none;
+        }
+
+        .cat-ico {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 19px;
+            flex-shrink: 0;
+        }
+
+        .txn-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .txn-desc {
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #e2e8f0;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .txn-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        .txn-right {
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        .txn-amt {
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .txn-amt.income {
+            color: #22c55e;
+        }
+
+        .txn-amt.expense {
+            color: #f87171;
+        }
+
+        .txn-date-sm {
+            font-size: 10.5px;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        .del-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #2d3748;
+            font-size: 14px;
+            padding: 5px 7px;
+            border-radius: 7px;
+            opacity: 0;
+            transition: all .15s;
+        }
+
+        .txn-row:hover .del-btn {
+            opacity: 1;
+        }
+
+        .del-btn:hover {
+            background: rgba(248, 113, 113, 0.15);
+            color: #f87171;
+        }
+
+        /* ── Empty state ── */
+        .empty-state {
+            text-align: center;
+            padding: 64px 20px;
+            color: #334155;
+        }
+
+        .empty-state .big {
+            font-size: 52px;
+            margin-bottom: 14px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+        }
+
+        @media(max-width:600px) {
+            .sum-strip {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper">
+
+            <!-- Top bar -->
+            <div class="txn-topbar">
+                <div>
+                    <h1>💳 Transactions</h1>
+                    <p>Your complete financial activity — grouped by date</p>
+                </div>
+                <div class="search-wrap">
+                    <input id="txnSearch" placeholder="Search transactions…" oninput="render()">
+                </div>
+            </div>
+
+            <!-- Summary strip -->
+            <div class="sum-strip">
+                <div class="sum-card">
+                    <div class="sum-ico" style="background:rgba(34,197,94,.1)">💰</div>
+                    <div>
+                        <div class="sum-lbl">Income</div>
+                        <div class="sum-val" id="sInc" style="color:#22c55e">₹0</div>
+                    </div>
+                </div>
+                <div class="sum-card">
+                    <div class="sum-ico" style="background:rgba(248,113,113,.1)">💸</div>
+                    <div>
+                        <div class="sum-lbl">Expense</div>
+                        <div class="sum-val" id="sExp" style="color:#f87171">₹0</div>
+                    </div>
+                </div>
+                <div class="sum-card">
+                    <div class="sum-ico" style="background:rgba(99,209,255,.1)">📊</div>
+                    <div>
+                        <div class="sum-lbl">Net Savings</div>
+                        <div class="sum-val" id="sNet" style="color:#63d1ff">₹0</div>
+                    </div>
+                </div>
+                <div class="sum-card">
+                    <div class="sum-ico" style="background:rgba(201,168,76,.1)">🔢</div>
+                    <div>
+                        <div class="sum-lbl">Count</div>
+                        <div class="sum-val" id="sCount" style="color:#c9a84c">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Month nav + filter pills -->
+            <div class="controls-row">
+                <div class="month-nav">
+                    <button class="mnav-btn" onclick="changeMonth(-1)">‹</button>
+                    <div class="mnav-label" id="mLabel">–</div>
+                    <button class="mnav-btn" onclick="changeMonth(1)">›</button>
+                </div>
+                <div class="pills" id="pills">
+                    <div class="pill active" onclick="setFilter('all',this)">All</div>
+                    <div class="pill" onclick="setFilter('income',this)">💰 Income</div>
+                    <div class="pill" onclick="setFilter('expense',this)">💸 Expense</div>
+                    <div class="pill" onclick="setFilter('food',this)">🍔 Food</div>
+                    <div class="pill" onclick="setFilter('transport',this)">🚗 Transport</div>
+                    <div class="pill" onclick="setFilter('shopping',this)">🛍 Shopping</div>
+                    <div class="pill" onclick="setFilter('entertainment',this)">🎬 Entertainment</div>
+                </div>
+            </div>
+
+            <!-- Transaction list -->
+            <div id="txnList"></div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "/login";
+
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+        const CAT_ICO = {
+            food: "🍔", groceries: "🛒", transport: "🚗", petrol: "⛽", fuel: "⛽",
+            entertainment: "🎬", shopping: "🛍", health: "💊", medical: "💊",
+            education: "📚", utilities: "💡", rent: "🏠", salary: "💰", income: "💰",
+            investment: "📈", insurance: "🛡", travel: "✈️", dining: "🍽",
+            subscriptions: "📱", gym: "💪", savings: "🏦", other: "💼"
+        };
+        const CAT_BG = {
+            food: "rgba(251,146,60,.13)", groceries: "rgba(34,197,94,.1)", transport: "rgba(99,209,255,.1)",
+            petrol: "rgba(99,209,255,.1)", fuel: "rgba(99,209,255,.1)", entertainment: "rgba(167,139,250,.1)",
+            shopping: "rgba(244,114,182,.1)", health: "rgba(248,113,113,.1)", medical: "rgba(248,113,113,.1)",
+            salary: "rgba(34,197,94,.1)", income: "rgba(34,197,94,.1)", investment: "rgba(201,168,76,.1)",
+            utilities: "rgba(251,191,36,.1)", rent: "rgba(147,197,253,.1)", other: "rgba(100,116,139,.1)"
+        };
+
+        let allTxns = [], filter = "all";
+        const now = new Date();
+        let curM = now.getMonth() + 1, curY = now.getFullYear();
+
+        const fmt = n => "₹" + Number(n).toLocaleString("en-IN");
+        const ck = s => (s || "other").toLowerCase();
+
+        async function load() {
+            const r = await fetch("/api/v1/transactions-list", { headers: { Authorization: "Bearer " + token } });
+            allTxns = await r.json();
+            render();
+        }
+
+        function changeMonth(d) {
+            curM += d;
+            if (curM > 12) { curM = 1; curY++; }
+            if (curM < 1) { curM = 12; curY--; }
+            render();
+        }
+
+        function setFilter(f, el) {
+            filter = f;
+            document.querySelectorAll(".pill").forEach(p => p.classList.remove("active"));
+            el.classList.add("active");
+            render();
+        }
+
+        function render() {
+            document.getElementById("mLabel").textContent = MONTHS[curM - 1] + " " + curY;
+            const q = document.getElementById("txnSearch").value.toLowerCase();
+
+            let list = allTxns.filter(t => {
+                const d = new Date(t.date);
+                if (d.getMonth() + 1 !== curM || d.getFullYear() !== curY) return false;
+                if (filter === "income" && t.type !== "income") return false;
+                if (filter === "expense" && t.type !== "expense") return false;
+                if (!["all", "income", "expense"].includes(filter) && !ck(t.category).includes(filter)) return false;
+                if (q && !t.description?.toLowerCase().includes(q) && !t.category?.toLowerCase().includes(q)) return false;
+                return true;
+            }).sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            // Summary
+            const inc = list.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+            const exp = list.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+            document.getElementById("sInc").textContent = fmt(inc);
+            document.getElementById("sExp").textContent = fmt(exp);
+            document.getElementById("sNet").textContent = fmt(inc - exp);
+            document.getElementById("sCount").textContent = list.length;
+
+            const el = document.getElementById("txnList");
+
+            if (!list.length) {
+                el.innerHTML = `<div class="empty-state"><div class="big">📭</div><p>No transactions for ${MONTHS[curM - 1]} ${curY}</p></div>`;
+                return;
+            }
+
+            // Group by date
+            const groups = {};
+            list.forEach(t => { if (!groups[t.date]) groups[t.date] = []; groups[t.date].push(t); });
+
+            el.innerHTML = Object.entries(groups).map(([date, txns]) => {
+                const d = new Date(date + "T00:00:00");
+                const todayS = new Date().toDateString();
+                const yesterS = new Date(Date.now() - 86400000).toDateString();
+                const label = d.toDateString() === todayS ? "Today" : d.toDateString() === yesterS ? "Yesterday" :
+                    d.toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
+                const dInc = txns.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+                const dExp = txns.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+                const netTxt = dInc && dExp ? `+${fmt(dInc)} · -${fmt(dExp)}` : dInc ? `+${fmt(dInc)}` : `-${fmt(dExp)}`;
+
+                const rows = txns.map(t => {
+                    const k = ck(t.category);
+                    const ico = CAT_ICO[k] || "💼";
+                    const bg = CAT_BG[k] || "rgba(100,116,139,.1)";
+                    const isI = t.type === "income";
+                    return `
+            <div class="txn-row" id="tr-${t.id}">
+                <div class="cat-ico" style="background:${bg}">${ico}</div>
+                <div class="txn-info">
+                    <div class="txn-desc">${t.description || t.category}</div>
+                    <div class="txn-sub">${t.category}</div>
+                </div>
+                <div class="txn-right">
+                    <div class="txn-amt ${t.type}">${isI ? "+" : "-"}${fmt(t.amount)}</div>
+                    <div class="txn-date-sm">${d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div>
+                </div>
+                <button class="del-btn" onclick="del(${t.id})" title="Delete">🗑</button>
+            </div>`;
+                }).join("");
+
+                return `
+        <div class="date-group">
+            <div class="date-header">
+                <span class="date-text">${label}</span>
+                <div class="date-line"></div>
+                <span class="date-net">${netTxt}</span>
+            </div>
+            ${rows}
+        </div>`;
+            }).join("");
+        }
+
+        async function del(id) {
+            document.getElementById("tr-" + id)?.classList.add("deleting");
+            await fetch(`/api/v1/transactions/${id}`, { method: "DELETE", headers: { Authorization: "Bearer " + token } });
+            allTxns = allTxns.filter(t => t.id !== id);
+            render();
+        }
+
+        load();
+    </script>
+</body>
+
+</html>

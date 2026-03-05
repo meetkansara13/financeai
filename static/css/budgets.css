@@ -1,0 +1,52 @@
+/* ========================= */
+/* BUDGET PAGE STYLING */
+/* ========================= */
+
+.budget-form {
+    display: flex;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 15px;
+}
+
+.budget-form input {
+    padding: 10px 14px;
+    border-radius: 8px;
+    border: 1px solid #1e293b;
+    background: #0f172a;
+    color: #e2e8f0;
+    flex: 1;
+    min-width: 200px;
+}
+
+.budget-form button {
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    background: #84cc16;
+    color: #0f172a;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+}
+
+.budget-form button:hover {
+    background: #a3e635;
+}
+
+#budgetList {
+    margin-top: 15px;
+}
+
+#budgetList .budget-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+#budgetAlert {
+    background: #3f1d1d;
+    border-left: 4px solid #f87171;
+    color: #fecaca;
+}

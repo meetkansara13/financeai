@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance AI — Sign In</title>
+    <link rel="stylesheet" href="/static/css/login.css">
+</head>
+
+<body>
+
+    <!-- Animated background -->
+    <div class="bg-layer">
+        <div class="bg-grid"></div>
+        <div class="bg-orb bg-orb-1"></div>
+        <div class="bg-orb bg-orb-2"></div>
+        <div class="bg-orb bg-orb-3"></div>
+    </div>
+
+    <!-- Main card -->
+    <div class="scene">
+
+        <!-- Left: Branding -->
+        <div class="brand-panel">
+            <div class="brand-logo">
+                <div class="logo-icon">💹</div>
+                <span class="logo-name">Finance<span>AI</span></span>
+            </div>
+
+            <div class="brand-headline">
+                <h1>Your money,<br><em>intelligently</em><br>managed.</h1>
+                <p>AI-powered insights, real-time tracking, and smart decisions — all in one place.</p>
+            </div>
+
+            <div class="brand-stats">
+                <div class="stat-row">
+                    <div class="stat-dot dot-gold"></div>
+                    <span class="stat-label">Portfolio Tracked</span>
+                    <span class="stat-value">₹12.4L</span>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-dot dot-cyan"></div>
+                    <span class="stat-label">Savings Rate</span>
+                    <span class="stat-value">34.2%</span>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-dot dot-green"></div>
+                    <span class="stat-label">Financial Score</span>
+                    <span class="stat-value">82 / 100</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Form -->
+        <div class="form-panel">
+
+            <div class="form-header">
+                <h2>Welcome back</h2>
+                <p>Sign in to your FinanceAI account</p>
+            </div>
+
+            <div class="form-body">
+
+                <div class="field-group">
+                    <label for="email">Email Address</label>
+                    <div class="input-wrap">
+                        <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+                        <span class="input-icon">✉</span>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="password">Password</label>
+                    <div class="input-wrap">
+                        <input type="password" id="password" placeholder="••••••••" autocomplete="current-password">
+                        <span class="input-icon">🔑</span>
+                        <button class="show-toggle" type="button" onclick="togglePassword(this)"
+                            aria-label="Toggle password">👁</button>
+                    </div>
+                </div>
+
+                <div class="form-footer-row">
+                    <a href="/forgot-password" class="forgot-link">Forgot password?</a>
+                </div>
+
+                <button class="btn-submit" onclick="handleLogin()" id="loginBtn">
+                    <span class="btn-text">Sign In</span>
+                    <span class="btn-spinner"></span>
+                </button>
+
+                <p id="error"></p>
+
+                <div class="divider"><span>or</span></div>
+
+                <div class="register-row">
+                    Don't have an account? <a href="/register">Create one free</a>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <script src="/static/js/app.js"></script>
+    <script>
+        function togglePassword(btn) {
+            const input = btn.closest('.input-wrap').querySelector('input');
+            const isHidden = input.type === 'password';
+            input.type = isHidden ? 'text' : 'password';
+            btn.textContent = isHidden ? '🙈' : '👁';
+        }
+
+        // Add loading state on top of the original login() from app.js
+        function handleLogin() {
+            const btn = document.getElementById('loginBtn');
+            const errEl = document.getElementById('error');
+            btn.classList.add('loading');
+            errEl.className = '';
+            errEl.textContent = '';
+            // Restore button after 3s fallback (in case of error)
+            setTimeout(() => btn.classList.remove('loading'), 3000);
+            // Call the real login function from app.js
+            login();
+        }
+
+        // Watch error element and style it
+        const _errEl = document.getElementById('error');
+        new MutationObserver(() => {
+            if (_errEl.textContent.trim()) {
+                _errEl.className = 'error';
+                document.getElementById('loginBtn').classList.remove('loading');
+            }
+        }).observe(_errEl, { childList: true, characterData: true, subtree: true });
+
+        // Enter key support
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Enter') handleLogin();
+        });
+    </script>
+
+</body>
+
+</html>

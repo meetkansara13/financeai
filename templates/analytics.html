@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Analytics — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
+        rel="stylesheet">
+    <style>
+        body,
+        * {
+            font-family: 'DM Sans', sans-serif;
+            box-sizing: border-box;
+        }
+
+        .page-wrapper {
+            padding: 24px 28px;
+        }
+
+        /* KPI strip */
+        .an-kpi {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .an-kpi-card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 14px;
+            padding: 16px 18px;
+            transition: border-color .2s;
+        }
+
+        .an-kpi-card:hover {
+            border-color: rgba(255, 255, 255, .14);
+        }
+
+        .an-kpi-lbl {
+            font-size: 10.5px;
+            font-weight: 600;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .an-kpi-val {
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 6px;
+        }
+
+        .an-kpi-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 3px;
+        }
+
+        .trend-up {
+            color: #22c55e;
+            font-size: 11px;
+        }
+
+        .trend-dn {
+            color: #f87171;
+            font-size: 11px;
+        }
+
+        /* Chart grid */
+        .an-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .an-grid2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .an-card {
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 20px 22px;
+        }
+
+        .an-card-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 4px;
+        }
+
+        .an-card-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-bottom: 18px;
+        }
+
+        .chart-wrap {
+            position: relative;
+            height: 220px;
+        }
+
+        .chart-wrap-sm {
+            position: relative;
+            height: 180px;
+        }
+
+        /* Category list */
+        .cat-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .cat-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .cat-item-ico {
+            width: 32px;
+            height: 32px;
+            border-radius: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+
+        .cat-item-name {
+            font-size: 12.5px;
+            color: #cbd5e1;
+            flex: 1;
+        }
+
+        .cat-bar-wrap {
+            width: 80px;
+            height: 5px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .cat-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        .cat-amt {
+            font-size: 12px;
+            font-weight: 700;
+            color: #e2e8f0;
+            min-width: 70px;
+            text-align: right;
+        }
+
+        /* Month selector */
+        .an-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .an-title h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #f0f4ff;
+            margin: 0;
+        }
+
+        .an-title p {
+            font-size: 12px;
+            color: #475569;
+            margin: 2px 0 0;
+        }
+
+        .month-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mnav-btn {
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 8px;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 5px 12px;
+            font-size: 18px;
+            line-height: 1;
+            transition: all .2s;
+        }
+
+        .mnav-btn:hover {
+            color: #c9a84c;
+            border-color: rgba(201, 168, 76, .3);
+        }
+
+        .mnav-label {
+            font-size: 13px;
+            font-weight: 700;
+            color: #c9a84c;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        /* Savings health bar */
+        .health-bar-wrap {
+            height: 8px;
+            background: rgba(255, 255, 255, .06);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 12px 0 6px;
+        }
+
+        .health-bar-fill {
+            height: 100%;
+            border-radius: 8px;
+            transition: width 1s ease;
+        }
+
+        /* Score ring */
+        .score-ring-wrap {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-top: 8px;
+        }
+
+        .score-ring {
+            position: relative;
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .score-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .score-ring .ring-val {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-weight: 700;
+            color: #c9a84c;
+        }
+
+        .score-details {
+            flex: 1;
+        }
+
+        .score-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 6px;
+        }
+
+        .score-row span:last-child {
+            font-weight: 600;
+            color: #94a3b8;
+        }
+
+        @media(max-width:900px) {
+            .an-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .an-grid2 {
+                grid-template-columns: 1fr;
+            }
+
+            .an-kpi {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media(max-width:500px) {
+            .an-kpi {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper">
+
+            <!-- Top bar -->
+            <div class="an-topbar">
+                <div class="an-title">
+                    <h1>📊 Financial Analytics</h1>
+                    <p>Deep insights into your income, expenses and saving patterns</p>
+                </div>
+                <div class="month-nav">
+                    <button class="mnav-btn" onclick="changeMonth(-1)">‹</button>
+                    <div class="mnav-label" id="mLabel">–</div>
+                    <button class="mnav-btn" onclick="changeMonth(1)">›</button>
+                </div>
+            </div>
+
+            <!-- KPI strip -->
+            <div class="an-kpi">
+                <div class="an-kpi-card">
+                    <div class="an-kpi-lbl">Total Income</div>
+                    <div class="an-kpi-val" id="kInc" style="color:#22c55e">₹0</div>
+                    <div class="an-kpi-sub" id="kIncSub">–</div>
+                </div>
+                <div class="an-kpi-card">
+                    <div class="an-kpi-lbl">Total Expense</div>
+                    <div class="an-kpi-val" id="kExp" style="color:#f87171">₹0</div>
+                    <div class="an-kpi-sub" id="kExpSub">–</div>
+                </div>
+                <div class="an-kpi-card">
+                    <div class="an-kpi-lbl">Net Savings</div>
+                    <div class="an-kpi-val" id="kSav" style="color:#63d1ff">₹0</div>
+                    <div class="an-kpi-sub" id="kSavSub">–</div>
+                </div>
+                <div class="an-kpi-card">
+                    <div class="an-kpi-lbl">Savings Rate</div>
+                    <div class="an-kpi-val" id="kRate" style="color:#c9a84c">0%</div>
+                    <div class="an-kpi-sub">of monthly income</div>
+                </div>
+                <div class="an-kpi-card">
+                    <div class="an-kpi-lbl">Transactions</div>
+                    <div class="an-kpi-val" id="kCount" style="color:#a78bfa">0</div>
+                    <div class="an-kpi-sub">this month</div>
+                </div>
+            </div>
+
+            <!-- Row 1: Trend chart + Savings health -->
+            <div class="an-grid">
+                <div class="an-card">
+                    <div class="an-card-title">📈 Income vs Expense — Monthly Trend</div>
+                    <div class="an-card-sub">Last 6 months at a glance</div>
+                    <div class="chart-wrap"><canvas id="trendChart"></canvas></div>
+                </div>
+                <div class="an-card">
+                    <div class="an-card-title">🏆 Financial Score</div>
+                    <div class="an-card-sub">Based on your saving & spending patterns</div>
+                    <div class="score-ring-wrap">
+                        <div class="score-ring">
+                            <svg width="80" height="80" viewBox="0 0 80 80">
+                                <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,.06)"
+                                    stroke-width="8" />
+                                <circle id="scoreArc" cx="40" cy="40" r="32" fill="none" stroke="#c9a84c"
+                                    stroke-width="8" stroke-dasharray="201" stroke-dashoffset="201"
+                                    stroke-linecap="round" style="transition:stroke-dashoffset 1.2s ease" />
+                            </svg>
+                            <div class="ring-val" id="scoreNum">–</div>
+                        </div>
+                        <div class="score-details">
+                            <div class="score-row"><span>Savings health</span><span id="srHealth">–</span></div>
+                            <div class="score-row"><span>Expense ratio</span><span id="srExp">–</span></div>
+                            <div class="score-row"><span>Safe limit</span><span id="srSafe">–</span></div>
+                            <div class="score-row"><span>Status</span><span id="srStatus">–</span></div>
+                        </div>
+                    </div>
+                    <div class="health-bar-wrap" style="margin-top:16px;">
+                        <div class="health-bar-fill" id="healthBar"
+                            style="width:0%;background:linear-gradient(90deg,#c9a84c,#22c55e)"></div>
+                    </div>
+                    <div style="font-size:11px;color:#475569;margin-top:4px;" id="healthLbl">–</div>
+                </div>
+            </div>
+
+            <!-- Row 2: Category bar + donut -->
+            <div class="an-grid2">
+                <div class="an-card">
+                    <div class="an-card-title">💸 Spending by Category</div>
+                    <div class="an-card-sub">Where your money goes</div>
+                    <div class="chart-wrap-sm"><canvas id="catChart"></canvas></div>
+                </div>
+                <div class="an-card">
+                    <div class="an-card-title">🍩 Expense Breakdown</div>
+                    <div class="an-card-sub">Proportional view</div>
+                    <div class="chart-wrap-sm"><canvas id="donutChart"></canvas></div>
+                </div>
+            </div>
+
+            <!-- Row 3: Category ranking list -->
+            <div class="an-card" style="margin-bottom:16px;">
+                <div class="an-card-title">📋 Category Ranking</div>
+                <div class="an-card-sub">Top spending categories this month</div>
+                <div class="cat-list" id="catList"></div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem("token");
+        if (!token) window.location.href = "/login";
+
+        const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+        const CAT_ICO = { food: "🍔", groceries: "🛒", transport: "🚗", entertainment: "🎬", shopping: "🛍", health: "💊", education: "📚", utilities: "💡", rent: "🏠", salary: "💰", investment: "📈", insurance: "🛡", travel: "✈️", dining: "🍽", subscriptions: "📱", gym: "💪", other: "💼" };
+        const PALETTE = ["#c9a84c", "#22c55e", "#63d1ff", "#a78bfa", "#f472b6", "#fb923c", "#34d399", "#60a5fa", "#f87171", "#fbbf24"];
+
+        const fmt = n => "₹" + Number(n).toLocaleString("en-IN");
+        const now = new Date();
+        let curM = now.getMonth() + 1, curY = now.getFullYear();
+        let trendChart, catChart, donutChart;
+
+        async function load() {
+            document.getElementById("mLabel").textContent = MONTHS[curM - 1] + " " + curY;
+
+            // Fetch all in parallel
+            const [trendR, catR, txnR, insightR] = await Promise.all([
+                fetch("/api/v1/monthly-trend", { headers: { Authorization: "Bearer " + token } }),
+                fetch("/api/v1/category-breakdown-advanced", { headers: { Authorization: "Bearer " + token } }),
+                fetch("/api/v1/transactions-list", { headers: { Authorization: "Bearer " + token } }),
+                fetch("/api/v1/advanced-insights", { headers: { Authorization: "Bearer " + token } }),
+            ]);
+
+            const trend = await trendR.json();
+            const catData = await catR.json();
+            const allTxns = await txnR.json();
+            const insight = await insightR.json();
+
+            // Filter transactions for current month
+            const monthTxns = allTxns.filter(t => {
+                const d = new Date(t.date);
+                return d.getMonth() + 1 === curM && d.getFullYear() === curY;
+            });
+            const mInc = monthTxns.filter(t => t.type === "income").reduce((s, t) => s + t.amount, 0);
+            const mExp = monthTxns.filter(t => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+            const mSav = mInc - mExp;
+            const mRate = mInc > 0 ? (mSav / mInc * 100).toFixed(1) : 0;
+
+            // KPIs
+            document.getElementById("kInc").textContent = fmt(mInc);
+            document.getElementById("kExp").textContent = fmt(mExp);
+            document.getElementById("kSav").textContent = fmt(mSav);
+            document.getElementById("kRate").textContent = mRate + "%";
+            document.getElementById("kCount").textContent = monthTxns.length;
+            document.getElementById("kIncSub").innerHTML = `<span class="trend-up">↑ Total earned</span>`;
+            document.getElementById("kExpSub").innerHTML = `<span class="trend-dn">↓ Total spent</span>`;
+            document.getElementById("kSavSub").innerHTML = mSav >= 0 ? `<span class="trend-up">✓ Positive balance</span>` : `<span class="trend-dn">✗ Overspending</span>`;
+
+            // Score ring
+            const score = insight.financial_score || 0;
+            document.getElementById("scoreNum").textContent = score;
+            const circ = 2 * Math.PI * 32;
+            document.getElementById("scoreArc").style.strokeDashoffset = circ - (circ * score / 100);
+            document.getElementById("scoreArc").style.stroke = score >= 70 ? "#22c55e" : score >= 40 ? "#c9a84c" : "#f87171";
+            document.getElementById("srHealth").textContent = mRate + "%";
+            document.getElementById("srExp").textContent = mInc > 0 ? (mExp / mInc * 100).toFixed(1) + "%" : "–";
+            document.getElementById("srSafe").textContent = fmt(insight.safe_expense_limit || 0);
+            document.getElementById("srStatus").textContent = insight.risk_level || "–";
+            document.getElementById("healthBar").style.width = Math.min(score, 100) + "%";
+            document.getElementById("healthLbl").textContent = score >= 70 ? "🟢 Excellent financial health" : score >= 40 ? "🟡 Moderate — room to improve" : "🔴 Needs attention";
+
+            // Trend chart
+            if (trendChart) trendChart.destroy();
+            trendChart = new Chart(document.getElementById("trendChart"), {
+                type: "line",
+                data: {
+                    labels: trend.labels,
+                    datasets: [
+                        {
+                            label: "Income", data: trend.income,
+                            borderColor: "#22c55e", backgroundColor: "rgba(34,197,94,.08)",
+                            fill: true, tension: .4, pointBackgroundColor: "#22c55e", pointRadius: 4
+                        },
+                        {
+                            label: "Expense", data: trend.expense,
+                            borderColor: "#f87171", backgroundColor: "rgba(248,113,113,.08)",
+                            fill: true, tension: .4, pointBackgroundColor: "#f87171", pointRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: "#94a3b8", font: { size: 11 } } } },
+                    scales: {
+                        x: { ticks: { color: "#475569", font: { size: 11 } }, grid: { color: "rgba(255,255,255,.04)" } },
+                        y: { ticks: { color: "#475569", font: { size: 11 }, callback: v => "₹" + Number(v).toLocaleString("en-IN") }, grid: { color: "rgba(255,255,255,.04)" } }
+                    }
+                }
+            });
+
+            // Category bar chart (month filtered)
+            const catTotals = {};
+            monthTxns.filter(t => t.type === "expense").forEach(t => {
+                catTotals[t.category] = (catTotals[t.category] || 0) + t.amount;
+            });
+            const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+            const catLabels = sortedCats.map(c => c[0]);
+            const catVals = sortedCats.map(c => c[1]);
+
+            if (catChart) catChart.destroy();
+            catChart = new Chart(document.getElementById("catChart"), {
+                type: "bar",
+                data: {
+                    labels: catLabels,
+                    datasets: [{
+                        label: "Expense", data: catVals,
+                        backgroundColor: PALETTE.map(c => c + "cc"),
+                        borderRadius: 6, borderSkipped: false
+                    }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { ticks: { color: "#475569", font: { size: 10 } }, grid: { display: false } },
+                        y: { ticks: { color: "#475569", font: { size: 10 }, callback: v => "₹" + Number(v / 1000).toFixed(0) + "k" }, grid: { color: "rgba(255,255,255,.04)" } }
+                    }
+                }
+            });
+
+            // Donut
+            if (donutChart) donutChart.destroy();
+            donutChart = new Chart(document.getElementById("donutChart"), {
+                type: "doughnut",
+                data: {
+                    labels: catLabels,
+                    datasets: [{ data: catVals, backgroundColor: PALETTE, borderWidth: 2, borderColor: "rgba(0,0,0,.2)" }]
+                },
+                options: {
+                    responsive: true, maintainAspectRatio: false, cutout: "65%",
+                    plugins: { legend: { position: "right", labels: { color: "#94a3b8", font: { size: 10 }, boxWidth: 10 } } }
+                }
+            });
+
+            // Category list
+            const maxVal = catVals[0] || 1;
+            document.getElementById("catList").innerHTML = sortedCats.slice(0, 8).map(([cat, amt], i) => {
+                const k = cat.toLowerCase();
+                const ico = CAT_ICO[k] || "💼";
+                const pct = (amt / maxVal * 100).toFixed(0);
+                return `
+        <div class="cat-item">
+            <div class="cat-item-ico" style="background:${PALETTE[i % PALETTE.length]}22">${ico}</div>
+            <span class="cat-item-name">${cat}</span>
+            <div class="cat-bar-wrap"><div class="cat-bar-fill" style="width:${pct}%;background:${PALETTE[i % PALETTE.length]}"></div></div>
+            <span class="cat-amt">${fmt(amt)}</span>
+        </div>`;
+            }).join("");
+        }
+
+        function changeMonth(d) {
+            curM += d;
+            if (curM > 12) { curM = 1; curY++; } if (curM < 1) { curM = 12; curY--; }
+            document.getElementById("mLabel").textContent = MONTHS[curM - 1] + " " + curY;
+            load();
+        }
+
+        document.addEventListener("DOMContentLoaded", load);
+    </script>
+</body>
+
+</html>
