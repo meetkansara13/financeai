@@ -23,7 +23,7 @@ MarkupSafe==3.0.3
 mdurl==0.1.2
 murmurhash==1.0.15
 numpy==2.4.2
-packaging @ file:///C:/miniconda3/conda-bld/packaging_1761049096285/work
+packaging==25.0
 pandas==3.0.1
 passlib==1.7.4
 preshed==3.0.12
