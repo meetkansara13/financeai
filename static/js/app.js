@@ -73,7 +73,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // 3. If no token on a protected page, redirect to login
-    const publicPages = ["login"];
+    const publicPages = ["login", "register", "forgot-password", "reset-password"];
     if (!token && !publicPages.includes(window.location.pathname.split("/")[1])) {
         window.location.href = "/login";
     }
