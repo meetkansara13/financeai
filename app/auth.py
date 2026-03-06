@@ -1,4 +1,5 @@
-from passlib.context import CryptContext
+import hashlib
+import bcrypt
 from jose import JWTError, jwt
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException
@@ -11,18 +12,16 @@ SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-# truncate_error=False tells passlib to silently truncate at 72 bytes
-pwd_context = CryptContext(
-    schemes=["bcrypt"],
-    deprecated="auto",
-    bcrypt__truncate_error=False
-)
+def _prepare(password: str) -> bytes:
+    # SHA-256 hash the password first → always 32 bytes → safe for bcrypt
+    return hashlib.sha256(password.encode("utf-8")).hexdigest().encode("utf-8")
 
-def hash_password(password: str):
-    return pwd_context.hash(password)
+def hash_password(password: str) -> str:
+    hashed = bcrypt.hashpw(_prepare(password), bcrypt.gensalt())
+    return hashed.decode("utf-8")
 
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return bcrypt.checkpw(_prepare(plain_password), hashed_password.encode("utf-8"))
 
 def create_access_token(data: dict):
     to_encode = data.copy()

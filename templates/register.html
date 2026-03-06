@@ -91,9 +91,9 @@
                     <label for="password">Password</label>
                     <div class="input-wrap">
                         <input type="password" id="password" placeholder="Min 8 characters" autocomplete="new-password"
-                            oninput="checkStrength(this.value)" maxlength="72" />
+                            oninput="checkStrength(this.value)" />
                         <span class="input-icon">🔑</span>
-                        <button class="show-toggle" type="button" onclick="togglePassword(this)"
+                        <button class="show-toggle" type="button" id="eyeBtn" onclick="togglePassword()"
                             aria-label="Toggle">👁</button>
                     </div>
                     <!-- Strength meter -->
@@ -137,11 +137,13 @@
 
     <script src="/static/js/app.js"></script>
     <script>
-        function togglePassword(btn) {
-            const input = btn.closest(".input-wrap").querySelector("input");
+        function togglePassword() {
+            const input = document.getElementById("password");
+            const btn = document.getElementById("eyeBtn");
             const isHidden = input.type === "password";
             input.type = isHidden ? "text" : "password";
             btn.textContent = isHidden ? "🙈" : "👁";
+            // keep placeholder intact — it's on the input element, type change doesn't affect it
         }
 
         function checkStrength(pw) {
