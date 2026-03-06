@@ -27,12 +27,19 @@ from app.ml.expense_forecast.predict import predict_month_end_expense
 from .services.notification_service import send_otp_sms, send_reset_email as notify_reset_email
 from .services.market_service import get_market_data_cached
 from .services.news_service import get_news_insights
-import re, os, random, secrets
+import re, os, random, secrets, traceback
+from fastapi.responses import JSONResponse
 
 
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+@app.exception_handler(Exception)
+async def global_exception_handler(request, exc):
+    traceback.print_exc()
+    return JSONResponse(status_code=500, content={"detail": str(exc)})
+
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 templates = Jinja2Templates(directory=os.path.join(BASE_DIR, "templates"))
@@ -56,18 +63,24 @@ def login_page(request: Request):
 
 @api_v1.post("/register")
 def register(user: schemas.UserCreate, db: Session = Depends(get_db)):
-    existing_user = db.query(models.User).filter(models.User.email == user.email).first()
-    if existing_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    hashed_pw = hash_password(user.password)
-    new_user = models.User(name=user.name, email=user.email, password=hashed_pw, mobile_number=getattr(user,'mobile_number',None))
-    db.add(new_user)
-    db.commit()
-    db.refresh(new_user)
-    return success_response("User registered successfully", {
-        "user_id": new_user.id,
-        "email": new_user.email
-    })
+    try:
+        existing_user = db.query(models.User).filter(models.User.email == user.email).first()
+        if existing_user:
+            raise HTTPException(status_code=400, detail="Email already registered")
+        hashed_pw = hash_password(user.password)
+        new_user = models.User(name=user.name, email=user.email, password=hashed_pw, mobile_number=getattr(user,'mobile_number',None))
+        db.add(new_user)
+        db.commit()
+        db.refresh(new_user)
+        return success_response("User registered successfully", {
+            "user_id": new_user.id,
+            "email": new_user.email
+        })
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/register", response_class=HTMLResponse)
 def register_page(request: Request):
