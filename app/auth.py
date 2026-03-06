@@ -11,15 +11,18 @@ SECRET_KEY = "supersecretkey"
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# truncate_error=False tells passlib to silently truncate at 72 bytes
+pwd_context = CryptContext(
+    schemes=["bcrypt"],
+    deprecated="auto",
+    bcrypt__truncate_error=False
+)
 
 def hash_password(password: str):
-    # bcrypt has a 72-byte limit — truncate to avoid ValueError
-    return pwd_context.hash(password.encode("utf-8")[:72].decode("utf-8", errors="ignore"))
+    return pwd_context.hash(password)
 
 def verify_password(plain_password, hashed_password):
-    truncated = plain_password.encode("utf-8")[:72].decode("utf-8", errors="ignore")
-    return pwd_context.verify(truncated, hashed_password)
+    return pwd_context.verify(plain_password, hashed_password)
 
 def create_access_token(data: dict):
     to_encode = data.copy()

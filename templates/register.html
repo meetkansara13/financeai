@@ -90,11 +90,32 @@
                 <div class="field-group">
                     <label for="password">Password</label>
                     <div class="input-wrap">
-                        <input type="password" id="password" placeholder="Min 8 characters"
-                            autocomplete="new-password" />
+                        <input type="password" id="password" placeholder="Min 8 characters" autocomplete="new-password"
+                            oninput="checkStrength(this.value)" maxlength="72" />
                         <span class="input-icon">🔑</span>
                         <button class="show-toggle" type="button" onclick="togglePassword(this)"
                             aria-label="Toggle">👁</button>
+                    </div>
+                    <!-- Strength meter -->
+                    <div id="strengthBar" style="display:none;margin-top:8px;">
+                        <div style="display:flex;gap:4px;margin-bottom:5px;">
+                            <div id="sb1"
+                                style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s;">
+                            </div>
+                            <div id="sb2"
+                                style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s;">
+                            </div>
+                            <div id="sb3"
+                                style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s;">
+                            </div>
+                            <div id="sb4"
+                                style="flex:1;height:3px;border-radius:3px;background:rgba(255,255,255,.08);transition:background .3s;">
+                            </div>
+                        </div>
+                        <div style="display:flex;justify-content:space-between;align-items:center;">
+                            <span id="strengthLabel" style="font-size:11px;font-weight:600;"></span>
+                            <span id="strengthTip" style="font-size:10px;color:#475569;"></span>
+                        </div>
                     </div>
                 </div>
 
@@ -123,6 +144,32 @@
             btn.textContent = isHidden ? "🙈" : "👁";
         }
 
+        function checkStrength(pw) {
+            const bar = document.getElementById("strengthBar");
+            if (!pw) { bar.style.display = "none"; return; }
+            bar.style.display = "block";
+
+            let score = 0;
+            if (pw.length >= 8) score++;
+            if (pw.length >= 12) score++;
+            if (/[A-Z]/.test(pw) && /[a-z]/.test(pw)) score++;
+            if (/[0-9]/.test(pw)) score++;
+            if (/[^A-Za-z0-9]/.test(pw)) score++;
+            score = Math.min(score, 4);
+
+            const colors = ["#f87171", "#fb923c", "#facc15", "#22c55e"];
+            const labels = ["Weak", "Fair", "Good", "Strong"];
+            const tips = ["Add uppercase & numbers", "Add special characters", "Almost there!", "Great password! ✓"];
+
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById("sb" + i).style.background =
+                    i <= score ? colors[score - 1] : "rgba(255,255,255,.08)";
+            }
+            document.getElementById("strengthLabel").textContent = labels[score - 1] || "";
+            document.getElementById("strengthLabel").style.color = colors[score - 1] || "#475569";
+            document.getElementById("strengthTip").textContent = tips[score - 1] || "";
+        }
+
         async function handleRegister() {
             const btn = document.getElementById("regBtn");
             const msg = document.getElementById("message");
@@ -141,20 +188,28 @@
             btn.classList.add("loading");
             msg.style.display = "none";
 
-            const res = await fetch("/api/v1/register", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ name, email, mobile_number: mobile, password })
-            });
-            const data = await res.json();
+            try {
+                const res = await fetch("/api/v1/register", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ name, email, mobile_number: mobile, password })
+                });
 
-            btn.classList.remove("loading");
+                let data;
+                const text = await res.text();
+                try { data = JSON.parse(text); } catch (e) { data = { detail: text }; }
 
-            if (res.ok) {
-                showMsg("✅ Account created! Redirecting to login…", true);
-                setTimeout(() => window.location.href = "/login", 1400);
-            } else {
-                showMsg(data.detail || "Registration failed.", false);
+                btn.classList.remove("loading");
+
+                if (res.ok) {
+                    showMsg("✅ Account created! Redirecting to login…", true);
+                    setTimeout(() => window.location.href = "/login", 1400);
+                } else {
+                    showMsg(data.detail || "Registration failed.", false);
+                }
+            } catch (err) {
+                btn.classList.remove("loading");
+                showMsg("Network error. Please try again.", false);
             }
         }
 
