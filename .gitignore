@@ -205,3 +205,34 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Environment variables - NEVER commit secrets
+.env
+.env.*
+!.env.example
+
+# Virtual environment
+f-env/
+venv/
+.venv/
+
+# Python cache (already covered but making explicit)
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ML model binaries - keep train scripts, not binaries
+*.pkl
+*.joblib
+*.h5
+*.pt
+*.pth
+
+# User uploaded documents - sensitive personal files
+uploads/
+!uploads/.gitkeep
+
+# OS files
+.DS_Store
+Thumbs.db
