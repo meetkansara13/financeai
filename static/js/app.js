@@ -183,3 +183,9 @@ document.addEventListener('DOMContentLoaded', function() {
         obs.observe(document.body, { childList: true, subtree: true });
     }
 });
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/static/service-worker.js');
+  });
+}
