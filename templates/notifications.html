@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Notifications — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=32">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=32">
+    <script src="/static/js/app.js?v=32"></script>
+    <style>
+        .notif-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            cursor: pointer;
+            transition: background .15s;
+            position: relative;
+        }
+
+        .notif-item:last-child {
+            border-bottom: none;
+        }
+
+        .notif-item:hover {
+            background: rgba(255, 255, 255, .02);
+        }
+
+        .notif-item.unread {
+            background: rgba(245, 200, 66, .03);
+        }
+
+        .notif-item.unread::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 3px;
+            background: #f5c842;
+            border-radius: 0 2px 2px 0;
+        }
+
+        .notif-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .notif-title {
+            font-size: 13.5px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 3px;
+        }
+
+        .notif-body {
+            font-size: 12px;
+            color: #64748b;
+            line-height: 1.4;
+        }
+
+        .notif-time {
+            font-size: 10.5px;
+            color: #334155;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+
+        .notif-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #f5c842;
+            flex-shrink: 0;
+            margin-top: 6px;
+        }
+
+        .mark-all {
+            padding: 7px 14px;
+            background: rgba(245, 200, 66, .08);
+            border: 1px solid rgba(245, 200, 66, .15);
+            border-radius: 8px;
+            color: #f5c842;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">Notifications</div>
+                    <div class="header-sub" id="unreadCount">Loading...</div>
+                </div>
+                <button class="mark-all" onclick="markAllRead()">Mark all read</button>
+            </div>
+
+            <!-- Filter pills -->
+            <div class="pill-bar" style="padding-top:12px;">
+                <button class="pill active" onclick="filterNotifs(this,'all')">All</button>
+                <button class="pill" onclick="filterNotifs(this,'alert')">Alerts</button>
+                <button class="pill" onclick="filterNotifs(this,'tip')">Tips</button>
+                <button class="pill" onclick="filterNotifs(this,'system')">System</button>
+            </div>
+
+            <!-- Today -->
+            <div class="date-badge">
+                <div class="date-badge-text">Today</div>
+                <div class="date-badge-line"></div>
+            </div>
+            <div class="app-card" id="notifList">
+                <!-- Populated by JS -->
+            </div>
+
+            <!-- Older -->
+            <div class="date-badge" style="margin-top:8px;">
+                <div class="date-badge-text">Earlier</div>
+                <div class="date-badge-line"></div>
+            </div>
+            <div class="app-card" id="notifListOld">
+                <!-- Populated by JS -->
+            </div>
+
+        </div>
+    </div>
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+
+        const NOTIFS = [
+            { id: 1, type: 'alert', icon: '⚠️', bg: 'rgba(244,63,94,.1)', title: 'Budget Limit Reached', body: 'Your Food & Dining budget has hit 90% this month. Time to slow down!', time: '2 hours ago', unread: true },
+            { id: 2, type: 'tip', icon: '💡', bg: 'rgba(245,200,66,.1)', title: 'AI Money Tip', body: 'You could save ₹3,200 more by reducing subscription services.', time: '5 hours ago', unread: true },
+            { id: 3, type: 'system', icon: '🎉', bg: 'rgba(16,185,129,.1)', title: 'Monthly Report Ready', body: 'Your March 2025 financial report is ready. Tap to view insights.', time: '8 hours ago', unread: true },
+            { id: 4, type: 'alert', icon: '📈', bg: 'rgba(59,130,246,.1)', title: 'Net Worth Milestone', body: 'Congratulations! Your net worth crossed ₹1,00,000 today.', time: '1 day ago', unread: false },
+            { id: 5, type: 'tip', icon: '🤖', bg: 'rgba(139,92,246,.1)', title: 'AI Insight', body: 'Based on your spending pattern, you are on track to save ₹8,500 this month.', time: '2 days ago', unread: false },
+            { id: 6, type: 'system', icon: '🔐', bg: 'rgba(245,200,66,.1)', title: 'Login from new device', body: 'New login detected from Chrome on Windows. Was this you?', time: '3 days ago', unread: false },
+            { id: 7, type: 'alert', icon: '💸', bg: 'rgba(244,63,94,.1)', title: 'Large Transaction', body: '₹15,000 payment to HDFC Bank detected and logged.', time: '4 days ago', unread: false },
+        ];
+
+        let currentFilter = 'all';
+
+        function renderNotifs(filter) {
+            const today = NOTIFS.filter(n => ['2 hours ago', '5 hours ago', '8 hours ago'].includes(n.time));
+            const old = NOTIFS.filter(n => !['2 hours ago', '5 hours ago', '8 hours ago'].includes(n.time));
+            const fToday = filter === 'all' ? today : today.filter(n => n.type === filter);
+            const fOld = filter === 'all' ? old : old.filter(n => n.type === filter);
+            document.getElementById('notifList').innerHTML = fToday.map(n => notifHTML(n)).join('') || '<div style="padding:20px;text-align:center;color:#475569;font-size:13px;">No notifications</div>';
+            document.getElementById('notifListOld').innerHTML = fOld.map(n => notifHTML(n)).join('') || '<div style="padding:20px;text-align:center;color:#475569;font-size:13px;">No notifications</div>';
+            const unread = NOTIFS.filter(n => n.unread).length;
+            document.getElementById('unreadCount').textContent = unread > 0 ? unread + ' unread' : 'All caught up';
+        }
+
+        function notifHTML(n) {
+            return `<div class="notif-item ${n.unread ? 'unread' : ''}" onclick="markRead(${n.id})">
+        <div class="notif-icon" style="background:${n.bg}">${n.icon}</div>
+        <div style="flex:1;">
+            <div class="notif-title">${n.title}</div>
+            <div class="notif-body">${n.body}</div>
+            <div class="notif-time">${n.time}</div>
+        </div>
+        ${n.unread ? '<div class="notif-dot"></div>' : ''}
+    </div>`;
+        }
+
+        function markRead(id) {
+            const n = NOTIFS.find(n => n.id === id);
+            if (n) { n.unread = false; renderNotifs(currentFilter); }
+        }
+
+        function markAllRead() {
+            NOTIFS.forEach(n => n.unread = false);
+            renderNotifs(currentFilter);
+            let t = document.querySelector('.app-toast'); if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); } t.textContent = '✅ All notifications marked as read'; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000);
+        }
+
+        function filterNotifs(btn, filter) {
+            document.querySelectorAll('.pill').forEach(p => p.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = filter;
+            renderNotifs(filter);
+        }
+
+        renderNotifs('all');
+    </script>
+</body>
+
+</html>

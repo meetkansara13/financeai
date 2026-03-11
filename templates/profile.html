@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Profile — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <script src="/static/js/app.js?v=50"></script>
+    <style>
+        .profile-hero {
+            margin: 16px 16px 0;
+            background: linear-gradient(135deg, #1a2235, #111827, #0f1623);
+            border: 1px solid rgba(245, 200, 66, .15);
+            border-radius: 20px;
+            padding: 28px 20px 22px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .profile-hero::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 220px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(245, 200, 66, .1), transparent 70%);
+            pointer-events: none;
+        }
+
+        .p-avatar {
+            width: 78px;
+            height: 78px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5c842, #e8a820);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: #0a0d14;
+            margin: 0 auto 14px;
+            position: relative;
+            z-index: 1;
+            box-shadow: 0 0 0 4px rgba(245, 200, 66, .2), 0 8px 30px rgba(245, 200, 66, .2);
+        }
+
+        .p-online {
+            position: absolute;
+            bottom: 3px;
+            right: 3px;
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            background: #10b981;
+            border: 2.5px solid #111827;
+            box-shadow: 0 0 6px #10b981;
+        }
+
+        .p-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 21px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            color: #f1f5f9;
+        }
+
+        .p-email {
+            font-size: 13px;
+            color: #64748b;
+            margin-bottom: 16px;
+        }
+
+        .p-tier {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 18px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, rgba(245, 200, 66, .12), rgba(232, 168, 32, .06));
+            border: 1px solid rgba(245, 200, 66, .25);
+            color: #f5c842;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .p-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1px;
+            background: rgba(255, 255, 255, .05);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 14px 16px 0;
+        }
+
+        .p-stat {
+            background: #111827;
+            padding: 16px 8px;
+            text-align: center;
+        }
+
+        .p-stat-val {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 3px;
+        }
+
+        .p-stat-lbl {
+            font-size: 10px;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+        }
+
+        .p-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 13px;
+            padding: 15px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            cursor: pointer;
+            text-decoration: none;
+            transition: background .15s;
+        }
+
+        .p-menu-item:last-child {
+            border-bottom: none;
+        }
+
+        .p-menu-item:hover {
+            background: rgba(255, 255, 255, .025);
+        }
+
+        .p-menu-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+
+        .p-menu-title {
+            font-size: 14.5px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .p-menu-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 1px;
+        }
+
+        .p-badge {
+            font-size: 10px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            flex-shrink: 0;
+        }
+
+        .p-menu-arrow {
+            color: #334155;
+            font-size: 20px;
+            font-weight: 300;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
+
+        .info-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        .info-row:last-child {
+            border-bottom: none;
+        }
+
+        .info-lbl {
+            font-size: 11px;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 3px;
+        }
+
+        .info-val {
+            font-size: 14px;
+            font-weight: 600;
+            color: #e2e8f0;
+        }
+
+        .edit-pill {
+            padding: 6px 14px;
+            background: rgba(245, 200, 66, .08);
+            border: 1px solid rgba(245, 200, 66, .2);
+            border-radius: 8px;
+            color: #f5c842;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all .2s;
+        }
+
+        .edit-pill:hover {
+            background: rgba(245, 200, 66, .15);
+        }
+
+        .signout-btn {
+            width: calc(100% - 32px);
+            margin: 8px 16px 20px;
+            padding: 14px;
+            background: rgba(244, 63, 94, .07);
+            border: 1.5px solid rgba(244, 63, 94, .18);
+            border-radius: 12px;
+            color: #f43f5e;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .signout-btn:hover {
+            background: rgba(244, 63, 94, .13);
+        }
+
+        .edit-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 300;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .edit-modal.open {
+            display: flex;
+        }
+
+        .edit-sheet {
+            background: #0e1118;
+            border: 1px solid rgba(245, 200, 66, .15);
+            border-radius: 22px 22px 0 0;
+            padding: 24px 20px 36px;
+            width: 100%;
+            max-width: 520px;
+            animation: slideUp .3s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .edit-sheet-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 18px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .ef {
+            margin-bottom: 14px;
+        }
+
+        .ef label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .ef input {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Nunito', sans-serif;
+            transition: border-color .2s;
+        }
+
+        .ef input:focus {
+            border-color: rgba(245, 200, 66, .4);
+        }
+
+        .edit-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: none;
+            color: #64748b;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .btn-save-p {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #f5c842, #e8a820);
+            color: #0a0d14;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">My Profile</div>
+                    <div class="header-sub">Account &amp; preferences</div>
+                </div>
+                <a href="/settings" class="header-action-btn" title="Settings">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path
+                            d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
+                    </svg>
+                </a>
+            </div>
+
+            <div class="profile-hero anim-fade-up" onclick="openEditModal()">
+                <div class="p-avatar" id="bigAvatar">M<div class="p-online"></div>
+                </div>
+                <div class="p-name" id="profileName">Loading...</div>
+                <div class="p-email" id="profileEmail">—</div>
+                <span class="p-tier">⭐ Pro Member · tap to edit</span>
+            </div>
+
+            <div class="p-stats stagger">
+                <div class="p-stat">
+                    <div class="p-stat-val hide-amount" id="statTxns" style="color:#f5c842;">—</div>
+                    <div class="p-stat-lbl">Transactions</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-val hide-amount" id="statSav" style="color:#10b981;">—%</div>
+                    <div class="p-stat-lbl">Savings Rate</div>
+                </div>
+                <div class="p-stat">
+                    <div class="p-stat-val" id="statScore" style="color:#3b82f6;">—</div>
+                    <div class="p-stat-lbl">Score</div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2>Account Info</h2>
+            </div>
+            <div class="app-card">
+                <div class="info-row">
+                    <div>
+                        <div class="info-lbl">Full Name</div>
+                        <div class="info-val" id="infoName">—</div>
+                    </div>
+                    <button class="edit-pill" onclick="openEditModal('name')">Edit</button>
+                </div>
+                <div class="info-row">
+                    <div>
+                        <div class="info-lbl">Email</div>
+                        <div class="info-val" id="infoEmail">—</div>
+                    </div>
+                </div>
+                <div class="info-row">
+                    <div>
+                        <div class="info-lbl">Mobile</div>
+                        <div class="info-val" id="infoMobile">Not set</div>
+                    </div>
+                    <button class="edit-pill" id="mobileBtn" onclick="openEditModal('mobile')">Add</button>
+                </div>
+                <div class="info-row">
+                    <div>
+                        <div class="info-lbl">Member Since</div>
+                        <div class="info-val" id="infoJoined">—</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section-title">
+                <h2>Quick Access</h2>
+            </div>
+            <div class="app-card">
+                <a href="/wealth" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(245,200,66,.1);">💎</div>
+                    <div>
+                        <div class="p-menu-title">Wealth Profile</div>
+                        <div class="p-menu-sub">KYC &amp; financial details</div>
+                    </div>
+                    <span class="p-menu-arrow">›</span>
+                </a>
+                <a href="/settings" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(99,209,255,.1);">⚙️</div>
+                    <div>
+                        <div class="p-menu-title">Settings</div>
+                        <div class="p-menu-sub">Notifications, security, preferences</div>
+                    </div>
+                    <span class="p-menu-arrow">›</span>
+                </a>
+                <a href="/invite" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(16,185,129,.1);">👥</div>
+                    <div>
+                        <div class="p-menu-title">Invite Friends</div>
+                        <div class="p-menu-sub">Earn ₹500 per successful referral</div>
+                    </div>
+                    <span class="p-badge"
+                        style="background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.25);">+₹500</span>
+                </a>
+                <a href="/gift" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(139,92,246,.1);">🎁</div>
+                    <div>
+                        <div class="p-menu-title">Send a Gift</div>
+                        <div class="p-menu-sub">Surprise your friends &amp; family</div>
+                    </div>
+                    <span class="p-menu-arrow">›</span>
+                </a>
+                <a href="/wallet" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(59,130,246,.1);">💳</div>
+                    <div>
+                        <div class="p-menu-title">FinanceAI Wallet</div>
+                        <div class="p-menu-sub">Unified payments &amp; UPI</div>
+                    </div>
+                    <span class="p-badge"
+                        style="background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.25);">NEW</span>
+                </a>
+                <a href="/notifications" class="p-menu-item">
+                    <div class="p-menu-icon" style="background:rgba(244,63,94,.08);">🔔</div>
+                    <div>
+                        <div class="p-menu-title">Notifications</div>
+                        <div class="p-menu-sub">Alerts, reminders &amp; activity</div>
+                    </div>
+                    <span class="p-menu-arrow">›</span>
+                </a>
+            </div>
+
+            <div style="height:8px;"></div>
+            <button class="signout-btn" onclick="logout()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Sign Out
+            </button>
+        </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="edit-modal" id="editModal" onclick="if(event.target===this)closeEditModal()">
+        <div class="edit-sheet">
+            <div class="edit-sheet-title" id="editModalTitle">Edit Profile</div>
+            <div class="ef" id="efName"><label>Display Name</label><input id="editName" placeholder="Your name" /></div>
+            <div class="ef" id="efMobile"><label>Mobile Number</label><input id="editMobile"
+                    placeholder="+91 XXXXX XXXXX" type="tel" /></div>
+            <div class="edit-actions">
+                <button class="btn-cancel" onclick="closeEditModal()">Cancel</button>
+                <button class="btn-save-p" onclick="saveProfile()">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+        const PKEY = 'financeai_profile_extra';
+
+        function toast(msg) {
+            let t = document.querySelector('.app-toast');
+            if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); }
+            t.textContent = msg; t.classList.add('show');
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        let userEmail = '';
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            userEmail = p.sub || '';
+            const saved = JSON.parse(localStorage.getItem(PKEY) || '{}');
+            const raw = userEmail.split('@')[0];
+            const defName = raw.split(/[._]/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+            const name = saved.name || defName;
+            const mobile = saved.mobile || '';
+            const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+            document.getElementById('bigAvatar').childNodes[0].textContent = initials;
+            document.getElementById('profileName').textContent = name;
+            document.getElementById('profileEmail').textContent = userEmail;
+            document.getElementById('infoName').textContent = name;
+            document.getElementById('infoEmail').textContent = userEmail;
+            document.getElementById('infoMobile').textContent = mobile || 'Not set';
+            document.getElementById('editName').value = name;
+            document.getElementById('editMobile').value = mobile;
+            if (mobile) document.getElementById('mobileBtn').textContent = 'Edit';
+            if (p.iat) document.getElementById('infoJoined').textContent =
+                new Date(p.iat * 1000).toLocaleDateString('en-IN', { year: 'numeric', month: 'long' });
+        } catch (e) { }
+
+        function openEditModal(focus) {
+            document.getElementById('efName').style.display = 'block';
+            document.getElementById('efMobile').style.display = 'block';
+            if (focus === 'name') {
+                document.getElementById('editModalTitle').textContent = 'Edit Name';
+                document.getElementById('efMobile').style.display = 'none';
+                setTimeout(() => document.getElementById('editName').focus(), 300);
+            } else if (focus === 'mobile') {
+                document.getElementById('editModalTitle').textContent = 'Add Mobile Number';
+                document.getElementById('efName').style.display = 'none';
+                setTimeout(() => document.getElementById('editMobile').focus(), 300);
+            } else {
+                document.getElementById('editModalTitle').textContent = 'Edit Profile';
+            }
+            document.getElementById('editModal').classList.add('open');
+        }
+
+        function closeEditModal() { document.getElementById('editModal').classList.remove('open'); }
+
+        function saveProfile() {
+            const newName = document.getElementById('editName').value.trim();
+            const newMobile = document.getElementById('editMobile').value.trim();
+            const saved = JSON.parse(localStorage.getItem(PKEY) || '{}');
+            if (document.getElementById('efName').style.display !== 'none') {
+                if (!newName) { toast('⚠️ Name cannot be empty'); return; }
+                saved.name = newName;
+                const initials = newName.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+                document.getElementById('bigAvatar').childNodes[0].textContent = initials;
+                document.getElementById('profileName').textContent = newName;
+                document.getElementById('infoName').textContent = newName;
+            }
+            if (document.getElementById('efMobile').style.display !== 'none' && newMobile) {
+                saved.mobile = newMobile;
+                document.getElementById('infoMobile').textContent = newMobile;
+                document.getElementById('mobileBtn').textContent = 'Edit';
+            }
+            localStorage.setItem(PKEY, JSON.stringify(saved));
+            closeEditModal();
+            toast('✅ Profile updated successfully!');
+        }
+
+        async function loadStats() {
+            try {
+                const [ins, txns] = await Promise.all([
+                    fetch('/api/v1/advanced-insights', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                    fetch('/api/v1/transactions-list', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                ]);
+                document.getElementById('statTxns').textContent = txns.length ?? 0;
+                document.getElementById('statSav').textContent = ins.savings_rate ? (ins.savings_rate * 100).toFixed(0) + '%' : '0%';
+                document.getElementById('statScore').textContent = ins.financial_score ?? 0;
+            } catch (e) { }
+        }
+        loadStats();
+    </script>
+</body>
+
+</html>

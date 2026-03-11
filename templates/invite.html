@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Invite Friends — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <script src="/static/js/app.js?v=50"></script>
+    <style>
+        .invite-hero {
+            margin: 16px 16px 0;
+            background: linear-gradient(135deg, #0d2018, #0a1a0d, #0d2018);
+            border: 1px solid rgba(16, 185, 129, .2);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .invite-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(16, 185, 129, .12), transparent 70%);
+        }
+
+        .invite-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 6px;
+        }
+
+        .invite-sub {
+            font-size: 13px;
+            color: #64748b;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+
+        .invite-amount {
+            font-family: 'Sora', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            color: #10b981;
+            line-height: 1;
+        }
+
+        .invite-amount-sub {
+            font-size: 12px;
+            color: #64748b;
+            margin-top: 4px;
+            margin-bottom: 20px;
+        }
+
+        .p-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1px;
+            background: rgba(255, 255, 255, .05);
+            border-radius: 16px;
+            overflow: hidden;
+            margin: 14px 16px 0;
+        }
+
+        .earn-stat {
+            background: #111827;
+            text-align: center;
+            padding: 16px 8px;
+        }
+
+        .earn-val {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #10b981;
+        }
+
+        .earn-lbl {
+            font-size: 10px;
+            color: #475569;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-top: 3px;
+        }
+
+        .ref-box {
+            margin: 0 16px 12px;
+            background: rgba(255, 255, 255, .04);
+            border: 1.5px dashed rgba(16, 185, 129, .3);
+            border-radius: 12px;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ref-code {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #10b981;
+        }
+
+        .copy-btn {
+            padding: 8px 16px;
+            background: rgba(16, 185, 129, .12);
+            border: 1px solid rgba(16, 185, 129, .25);
+            border-radius: 8px;
+            color: #10b981;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all .2s;
+        }
+
+        .copy-btn:hover {
+            background: rgba(16, 185, 129, .2);
+        }
+
+        .share-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            padding: 0 16px 12px;
+        }
+
+        .share-btn {
+            padding: 14px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, .07);
+            background: #111827;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            color: #e2e8f0;
+            text-decoration: none;
+        }
+
+        .share-btn:hover {
+            background: #1e2a3a;
+            transform: translateY(-1px);
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 14px;
+            padding: 14px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        .step-item:last-child {
+            border-bottom: none;
+        }
+
+        .step-num {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: rgba(16, 185, 129, .12);
+            border: 1.5px solid rgba(16, 185, 129, .25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #10b981;
+            flex-shrink: 0;
+        }
+
+        .step-text-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin-bottom: 2px;
+        }
+
+        .step-text-sub {
+            font-size: 12px;
+            color: #475569;
+            line-height: 1.4;
+        }
+
+        /* Manual invite */
+        .invite-input-row {
+            display: flex;
+            gap: 8px;
+            padding: 0 16px 12px;
+        }
+
+        .invite-input-row input {
+            flex: 1;
+            padding: 11px 14px;
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .invite-input-row input:focus {
+            border-color: rgba(16, 185, 129, .4);
+        }
+
+        .invite-send-btn {
+            padding: 11px 18px;
+            background: rgba(16, 185, 129, .12);
+            border: 1px solid rgba(16, 185, 129, .25);
+            border-radius: 10px;
+            color: #10b981;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            white-space: nowrap;
+        }
+
+        /* Referral list */
+        .ref-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        .ref-item:last-child {
+            border-bottom: none;
+        }
+
+        .ref-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .ref-name {
+            font-size: 13px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .ref-status {
+            font-size: 11px;
+            margin-top: 2px;
+        }
+
+        .ref-reward {
+            font-size: 13px;
+            font-weight: 700;
+            color: #10b981;
+            margin-left: auto;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 24px 16px;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .empty-state .e-ico {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">Invite Friends</div>
+                    <div class="header-sub">Earn ₹500 per referral</div>
+                </div>
+                <a href="/profile" class="header-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M6 20v-2a6 6 0 0 1 12 0v2" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Hero -->
+            <div class="invite-hero anim-fade-up">
+                <span style="font-size:52px;display:block;margin-bottom:12px;">🤝</span>
+                <div class="invite-title">Refer &amp; Earn</div>
+                <div class="invite-sub">Invite friends to FinanceAI — both of you earn rewards!</div>
+                <div class="invite-amount">₹500</div>
+                <div class="invite-amount-sub">per successful referral · unlimited earnings</div>
+            </div>
+
+            <!-- Stats -->
+            <div class="p-stats stagger">
+                <div class="earn-stat">
+                    <div class="earn-val" id="totalEarned">₹0</div>
+                    <div class="earn-lbl">Earned</div>
+                </div>
+                <div class="earn-stat"
+                    style="border-left:1px solid rgba(255,255,255,.05);border-right:1px solid rgba(255,255,255,.05);">
+                    <div class="earn-val" id="totalInvited">0</div>
+                    <div class="earn-lbl">Invited</div>
+                </div>
+                <div class="earn-stat">
+                    <div class="earn-val" id="totalJoined">0</div>
+                    <div class="earn-lbl">Joined</div>
+                </div>
+            </div>
+
+            <!-- Referral Code -->
+            <div class="section-title">
+                <h2>Your Referral Code</h2>
+            </div>
+            <div class="ref-box">
+                <div>
+                    <div
+                        style="font-size:10px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;">
+                        Share this code</div>
+                    <div class="ref-code" id="refCode">FAI—...</div>
+                </div>
+                <button class="copy-btn" onclick="copyCode()">📋 Copy</button>
+            </div>
+
+            <!-- Invite manually -->
+            <div class="section-title">
+                <h2>Invite by Phone / Email</h2>
+            </div>
+            <div class="invite-input-row">
+                <input id="inviteContact" placeholder="Enter phone or email" type="text" />
+                <button class="invite-send-btn" onclick="sendInvite()">Send →</button>
+            </div>
+
+            <!-- Share buttons -->
+            <div class="section-title">
+                <h2>Share Via</h2>
+            </div>
+            <div class="share-grid">
+                <a onclick="shareWhatsApp()" class="share-btn"><span style="font-size:20px;">💬</span> WhatsApp</a>
+                <a onclick="shareLink()" class="share-btn"><span style="font-size:20px;">🔗</span> Copy Link</a>
+                <a onclick="shareEmail()" class="share-btn"><span style="font-size:20px;">📧</span> Email</a>
+                <a onclick="shareNative()" class="share-btn"><span style="font-size:20px;">📤</span> More</a>
+            </div>
+
+            <!-- People Invited -->
+            <div class="section-title">
+                <h2>People Invited</h2>
+            </div>
+            <div class="app-card" id="refList">
+                <div class="empty-state">
+                    <div class="e-ico">👥</div>
+                    <div>No invites sent yet</div>
+                    <div style="margin-top:6px;font-size:12px;">Invite friends to see them here</div>
+                </div>
+            </div>
+
+            <!-- How it works -->
+            <div class="section-title">
+                <h2>How It Works</h2>
+            </div>
+            <div class="app-card">
+                <div class="step-item">
+                    <div class="step-num">1</div>
+                    <div>
+                        <div class="step-text-title">Share your referral code</div>
+                        <div class="step-text-sub">Send your unique code via WhatsApp, email or any platform</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">2</div>
+                    <div>
+                        <div class="step-text-title">Friend signs up</div>
+                        <div class="step-text-sub">They register on FinanceAI using your referral code</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">3</div>
+                    <div>
+                        <div class="step-text-title">Both of you earn ₹500</div>
+                        <div class="step-text-sub">Reward credited once they complete their first transaction</div>
+                    </div>
+                </div>
+                <div class="step-item">
+                    <div class="step-num">∞</div>
+                    <div>
+                        <div class="step-text-title">Unlimited referrals</div>
+                        <div class="step-text-sub">No cap — invite as many friends as you want</div>
+                    </div>
+                </div>
+            </div>
+            <div style="height:20px;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+        const IK = 'financeai_invites';
+
+        function toast(m) {
+            let t = document.querySelector('.app-toast');
+            if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); }
+            t.textContent = m; t.classList.add('show');
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        let myCode = 'FAI-...';
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            const raw = p.sub?.split('@')[0]?.toUpperCase() || 'USER';
+            // Deterministic code from email — same every time
+            let hash = 0;
+            for (let c of (p.sub || '')) hash = (hash * 31 + c.charCodeAt(0)) & 0xffffffff;
+            const num = Math.abs(hash) % 9000 + 1000;
+            myCode = 'FAI-' + raw.slice(0, 4) + num;
+            document.getElementById('refCode').textContent = myCode;
+        } catch (e) { }
+
+        function getInvites() { return JSON.parse(localStorage.getItem(IK) || '[]'); }
+        function saveInvites(a) { localStorage.setItem(IK, JSON.stringify(a)); }
+
+        function refreshStats() {
+            const inv = getInvites();
+            const joined = inv.filter(i => i.joined).length;
+            document.getElementById('totalInvited').textContent = inv.length;
+            document.getElementById('totalJoined').textContent = joined;
+            document.getElementById('totalEarned').textContent = '₹' + (joined * 500).toLocaleString('en-IN');
+        }
+
+        function renderList() {
+            const inv = getInvites();
+            const el = document.getElementById('refList');
+            if (!inv.length) {
+                el.innerHTML = '<div class="empty-state"><div class="e-ico">👥</div><div>No invites sent yet</div><div style="margin-top:6px;font-size:12px;">Invite friends to see them here</div></div>';
+                return;
+            }
+            el.innerHTML = inv.slice().reverse().map((i, idx) => {
+                const initial = (i.contact[0] || '?').toUpperCase();
+                return `<div class="ref-item">
+                    <div class="ref-avatar">${initial}</div>
+                    <div>
+                        <div class="ref-name">${i.contact}</div>
+                        <div class="ref-status" style="color:${i.joined ? '#10b981' : '#f59e0b'};">${i.joined ? '✅ Joined' : '⏳ Pending'}</div>
+                    </div>
+                    <div class="ref-reward">${i.joined ? '+₹500' : '—'}</div>
+                </div>`;
+            }).join('');
+        }
+
+        function sendInvite() {
+            const contact = document.getElementById('inviteContact').value.trim();
+            if (!contact) { toast('⚠️ Enter a phone number or email'); return; }
+            const invites = getInvites();
+            if (invites.find(i => i.contact === contact)) { toast('ℹ️ Already invited ' + contact); return; }
+            // Simulate 40% chance they join after a few seconds (for demo)
+            const willJoin = Math.random() < 0.4;
+            const entry = { contact, joined: false, date: new Date().toLocaleDateString('en-IN') };
+            invites.push(entry);
+            saveInvites(invites);
+            document.getElementById('inviteContact').value = '';
+            renderList(); refreshStats();
+            toast('📨 Invite sent to ' + contact + '!');
+            if (willJoin) {
+                setTimeout(() => {
+                    const fresh = getInvites();
+                    const idx = fresh.findIndex(i => i.contact === contact);
+                    if (idx !== -1) { fresh[idx].joined = true; saveInvites(fresh); renderList(); refreshStats(); toast('🎉 ' + contact + ' joined! You earned ₹500!'); }
+                }, 4000 + Math.random() * 4000);
+            }
+        }
+
+        function copyCode() {
+            navigator.clipboard?.writeText(myCode).then(() => toast('✅ Code copied!'))
+                .catch(() => toast('Code: ' + myCode));
+        }
+        function shareWhatsApp() {
+            window.open('https://wa.me/?text=Join+FinanceAI+with+my+code+' + myCode + '+and+we+both+earn+%E2%82%B9500!+https://financeai-kthm.onrender.com/register?ref=' + myCode);
+        }
+        function shareLink() {
+            const url = 'https://financeai-kthm.onrender.com/register?ref=' + myCode;
+            navigator.clipboard?.writeText(url).then(() => toast('🔗 Link copied!'));
+        }
+        function shareEmail() {
+            window.open('mailto:?subject=Join+FinanceAI&body=Use+my+code+' + myCode + '+to+sign+up+and+we+both+earn+%E2%82%B9500!%0Ahttps://financeai-kthm.onrender.com/register?ref=' + myCode);
+        }
+        function shareNative() {
+            if (navigator.share) {
+                navigator.share({ title: 'Join FinanceAI', text: 'Use my code ' + myCode + ' and earn ₹500!', url: 'https://financeai-kthm.onrender.com/register?ref=' + myCode });
+            } else shareLink();
+        }
+
+        renderList();
+        refreshStats();
+    </script>
+</body>
+
+</html>

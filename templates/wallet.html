@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinanceAI Wallet</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <script src="/static/js/app.js?v=50"></script>
+    <style>
+        .wallet-hero {
+            margin: 16px 16px 0;
+            background: linear-gradient(135deg, #0a1628, #0f1e38, #0a1628);
+            border: 1px solid rgba(59, 130, 246, .25);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .wallet-hero::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 180px;
+            height: 180px;
+            background: radial-gradient(circle, rgba(59, 130, 246, .15), transparent 70%);
+        }
+
+        .wallet-balance {
+            font-family: 'Sora', sans-serif;
+            font-size: 42px;
+            font-weight: 800;
+            color: #f1f5f9;
+            line-height: 1;
+            margin-bottom: 4px;
+        }
+
+        .wallet-sub {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .wallet-actions {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .w-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .w-action-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            border: 1px solid rgba(255, 255, 255, .1);
+            transition: transform .2s, box-shadow .2s;
+        }
+
+        .w-action:hover .w-action-icon {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, .3);
+        }
+
+        .w-action-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
+        }
+
+        .upi-card {
+            margin: 0 16px 12px;
+            background: #111827;
+            border: 1px solid rgba(59, 130, 246, .15);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .upi-id {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #3b82f6;
+        }
+
+        .upi-copy {
+            padding: 6px 14px;
+            background: rgba(59, 130, 246, .1);
+            border: 1px solid rgba(59, 130, 246, .2);
+            border-radius: 8px;
+            color: #3b82f6;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all .2s;
+        }
+
+        .upi-copy:hover {
+            background: rgba(59, 130, 246, .2);
+        }
+
+        .txn-row2 {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        .txn-row2:last-child {
+            border-bottom: none;
+        }
+
+        .txn2-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .txn2-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .txn2-date {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .txn2-amt {
+            font-size: 14px;
+            font-weight: 700;
+            margin-left: auto;
+        }
+
+        /* Modal */
+        .w-modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 300;
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .w-modal.open {
+            display: flex;
+        }
+
+        .w-sheet {
+            background: #0e1118;
+            border: 1px solid rgba(59, 130, 246, .2);
+            border-radius: 22px 22px 0 0;
+            padding: 24px 20px 36px;
+            width: 100%;
+            max-width: 520px;
+            animation: slideUp .3s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        .w-sheet-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 18px;
+            font-family: 'Sora', sans-serif;
+        }
+
+        .wf {
+            margin-bottom: 14px;
+        }
+
+        .wf label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .wf input,
+        .wf select {
+            width: 100%;
+            padding: 11px 14px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            color: #e2e8f0;
+            font-size: 14px;
+            outline: none;
+            font-family: 'Nunito', sans-serif;
+            transition: border-color .2s;
+        }
+
+        .wf input:focus,
+        .wf select:focus {
+            border-color: rgba(59, 130, 246, .4);
+        }
+
+        .wf select option {
+            background: #1e2837;
+        }
+
+        .w-actions-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 4px;
+        }
+
+        .w-btn-cancel {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid rgba(255, 255, 255, .08);
+            background: none;
+            color: #64748b;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .w-btn-ok {
+            flex: 1;
+            padding: 12px;
+            background: linear-gradient(135deg, #3b82f6, #2563eb);
+            color: #fff;
+            border: none;
+            border-radius: 10px;
+            font-weight: 800;
+            cursor: pointer;
+            font-size: 14px;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        .balance-chip {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            background: rgba(59, 130, 246, .1);
+            color: #3b82f6;
+            border: 1px solid rgba(59, 130, 246, .2);
+            margin-bottom: 8px;
+        }
+
+        .linked-card {
+            margin: 0 16px 12px;
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, .07);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .card-chip {
+            width: 42px;
+            height: 42px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .card-num {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .card-type {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 2px;
+        }
+
+        .remove-btn {
+            margin-left: auto;
+            padding: 5px 10px;
+            background: rgba(244, 63, 94, .08);
+            border: 1px solid rgba(244, 63, 94, .2);
+            border-radius: 7px;
+            color: #f43f5e;
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(100%);
+                opacity: 0
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1
+            }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 28px 16px;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .empty-state .e-ico {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">FinanceAI Wallet</div>
+                    <div class="header-sub" style="display:flex;align-items:center;gap:4px;">
+                        <span
+                            style="width:6px;height:6px;background:#10b981;border-radius:50%;display:inline-block;"></span>
+                        Active
+                    </div>
+                </div>
+                <a href="/profile" class="header-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M6 20v-2a6 6 0 0 1 12 0v2" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Hero -->
+            <div class="wallet-hero anim-fade-up">
+                <div class="balance-chip">💳 Wallet Balance</div>
+                <div class="wallet-balance hide-amount" id="walletBal">₹0.00</div>
+                <div class="wallet-sub" id="walletSub">Tap "Add Money" to load your wallet</div>
+                <div class="wallet-actions">
+                    <div class="w-action" onclick="openModal('add')">
+                        <div class="w-action-icon"
+                            style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.2);">➕</div>
+                        <span class="w-action-label">Add Money</span>
+                    </div>
+                    <div class="w-action" onclick="openModal('send')">
+                        <div class="w-action-icon"
+                            style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);">📤</div>
+                        <span class="w-action-label">Send</span>
+                    </div>
+                    <div class="w-action" onclick="openModal('upi')">
+                        <div class="w-action-icon"
+                            style="background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.2);">💸</div>
+                        <span class="w-action-label">Pay UPI</span>
+                    </div>
+                    <div class="w-action" onclick="showHistory()">
+                        <div class="w-action-icon"
+                            style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);">📋</div>
+                        <span class="w-action-label">History</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- UPI ID -->
+            <div class="section-title">
+                <h2>Your UPI ID</h2>
+            </div>
+            <div class="upi-card">
+                <div>
+                    <div
+                        style="font-size:10px;color:#475569;font-weight:700;text-transform:uppercase;margin-bottom:3px;">
+                        UPI ID</div>
+                    <div class="upi-id" id="upiId">yourname@financeai</div>
+                </div>
+                <button class="upi-copy" onclick="copyUPI()">📋 Copy</button>
+            </div>
+
+            <!-- Linked Accounts -->
+            <div class="section-title">
+                <h2>Linked Accounts</h2>
+            </div>
+            <div id="linkedList">
+                <div class="empty-state">
+                    <div class="e-ico">🏦</div>
+                    <div>No accounts linked yet</div>
+                    <div style="margin-top:6px;font-size:12px;">Add a bank account to start transacting</div>
+                </div>
+            </div>
+            <div style="padding:0 16px 12px;">
+                <button class="btn-primary-app" onclick="openModal('link')"
+                    style="background:rgba(59,130,246,.1);color:#3b82f6;border:1px solid rgba(59,130,246,.2);box-shadow:none;">
+                    + Link Bank Account
+                </button>
+            </div>
+
+            <!-- Transaction History -->
+            <div class="section-title" id="historyTitle" style="display:none;">
+                <h2>Transaction History</h2>
+            </div>
+            <div class="app-card" id="historyList" style="display:none;"></div>
+
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="w-modal" id="wModal" onclick="if(event.target===this)closeModal()">
+        <div class="w-sheet">
+            <div class="w-sheet-title" id="wModalTitle">Action</div>
+            <div id="wModalBody"></div>
+            <div class="w-actions-row">
+                <button class="w-btn-cancel" onclick="closeModal()">Cancel</button>
+                <button class="w-btn-ok" id="wModalOk" onclick="confirmModal()">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+
+        const WK = 'financeai_wallet';
+        function getWallet() { return JSON.parse(localStorage.getItem(WK) || '{"balance":0,"txns":[],"accounts":[]}'); }
+        function saveWallet(w) { localStorage.setItem(WK, JSON.stringify(w)); }
+
+        function toast(m) {
+            let t = document.querySelector('.app-toast');
+            if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); }
+            t.textContent = m; t.classList.add('show');
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        // Init UPI
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            const raw = p.sub?.split('@')[0]?.toLowerCase().replace(/[._]/g, '');
+            document.getElementById('upiId').textContent = raw + '@financeai';
+        } catch (e) { }
+
+        function refreshUI() {
+            const w = getWallet();
+            document.getElementById('walletBal').textContent = '₹' + w.balance.toLocaleString('en-IN', { minimumFractionDigits: 2 });
+            document.getElementById('walletSub').textContent = w.balance > 0 ? 'Available to spend or send' : 'Tap "Add Money" to load your wallet';
+            renderAccounts(w);
+        }
+
+        function renderAccounts(w) {
+            const list = document.getElementById('linkedList');
+            if (!w.accounts.length) {
+                list.innerHTML = '<div class="empty-state"><div class="e-ico">🏦</div><div>No accounts linked yet</div><div style="margin-top:6px;font-size:12px;">Add a bank account to start transacting</div></div>';
+                return;
+            }
+            list.innerHTML = w.accounts.map((a, i) => `
+                <div class="linked-card">
+                    <div class="card-chip">🏦</div>
+                    <div><div class="card-num">${a.bank} ····${a.last4}</div><div class="card-type">${a.type} · Linked</div></div>
+                    <button class="remove-btn" onclick="removeAccount(${i})">Remove</button>
+                </div>`).join('');
+        }
+
+        function removeAccount(i) {
+            const w = getWallet(); w.accounts.splice(i, 1); saveWallet(w); renderAccounts(w);
+            toast('🏦 Account removed');
+        }
+
+        function showHistory() {
+            const w = getWallet();
+            const title = document.getElementById('historyTitle');
+            const list = document.getElementById('historyList');
+            title.style.display = 'block'; list.style.display = 'block';
+            if (!w.txns.length) { list.innerHTML = '<div class="empty-state"><div class="e-ico">📋</div><div>No transactions yet</div></div>'; return; }
+            list.innerHTML = w.txns.slice().reverse().map(t => `
+                <div class="txn-row2">
+                    <div class="txn2-icon" style="background:rgba(${t.type === 'credit' ? '16,185,129' : '248,113,113'},.1);">${t.type === 'credit' ? '⬇️' : '⬆️'}</div>
+                    <div><div class="txn2-name">${t.desc}</div><div class="txn2-date">${t.date}</div></div>
+                    <div class="txn2-amt" style="color:${t.type === 'credit' ? '#10b981' : '#f87171'};">${t.type === 'credit' ? '+' : '-'}₹${t.amount.toLocaleString('en-IN')}</div>
+                </div>`).join('');
+            list.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        let _modalMode = '';
+        function openModal(mode) {
+            _modalMode = mode;
+            const body = document.getElementById('wModalBody');
+            const title = document.getElementById('wModalTitle');
+            if (mode === 'add') {
+                title.textContent = '➕ Add Money';
+                body.innerHTML = `
+                    <div class="wf"><label>Amount (₹)</label><input id="wAmt" type="number" placeholder="Enter amount" min="1" max="100000" /></div>
+                    <div class="wf"><label>Source</label><select id="wSrc">
+                        <option>UPI</option><option>Net Banking</option><option>Debit Card</option><option>Credit Card</option>
+                    </select></div>`;
+            } else if (mode === 'send') {
+                title.textContent = '📤 Send Money';
+                body.innerHTML = `
+                    <div class="wf"><label>Recipient UPI / Mobile</label><input id="wTo" placeholder="name@upi or 9876543210" /></div>
+                    <div class="wf"><label>Amount (₹)</label><input id="wAmt" type="number" placeholder="Enter amount" min="1" /></div>
+                    <div class="wf"><label>Note (optional)</label><input id="wNote" placeholder="e.g. Dinner split" /></div>`;
+            } else if (mode === 'upi') {
+                title.textContent = '💸 Pay via UPI';
+                body.innerHTML = `
+                    <div class="wf"><label>UPI ID</label><input id="wTo" placeholder="merchant@upi" /></div>
+                    <div class="wf"><label>Amount (₹)</label><input id="wAmt" type="number" placeholder="Enter amount" min="1" /></div>
+                    <div class="wf"><label>Remarks</label><input id="wNote" placeholder="e.g. Grocery bill" /></div>`;
+            } else if (mode === 'link') {
+                title.textContent = '🏦 Link Bank Account';
+                body.innerHTML = `
+                    <div class="wf"><label>Bank Name</label><select id="wBank">
+                        <option>SBI</option><option>HDFC</option><option>ICICI</option><option>Axis</option><option>Kotak</option><option>Yes Bank</option><option>PNB</option><option>Bank of Baroda</option>
+                    </select></div>
+                    <div class="wf"><label>Account Number</label><input id="wAccNum" type="number" placeholder="Enter account number" /></div>
+                    <div class="wf"><label>Account Type</label><select id="wAccType"><option>Savings</option><option>Current</option></select></div>`;
+            }
+            document.getElementById('wModal').classList.add('open');
+        }
+
+        function closeModal() { document.getElementById('wModal').classList.remove('open'); }
+
+        function confirmModal() {
+            const w = getWallet();
+            const now = new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+
+            if (_modalMode === 'add') {
+                const amt = parseFloat(document.getElementById('wAmt')?.value);
+                const src = document.getElementById('wSrc')?.value;
+                if (!amt || amt <= 0) { toast('⚠️ Enter a valid amount'); return; }
+                if (amt > 100000) { toast('⚠️ Max ₹1,00,000 per transaction'); return; }
+                w.balance += amt;
+                w.txns.push({ type: 'credit', desc: `Added via ${src}`, amount: amt, date: now });
+                saveWallet(w); refreshUI(); closeModal();
+                toast(`✅ ₹${amt.toLocaleString('en-IN')} added successfully!`);
+
+            } else if (_modalMode === 'send' || _modalMode === 'upi') {
+                const to = document.getElementById('wTo')?.value.trim();
+                const amt = parseFloat(document.getElementById('wAmt')?.value);
+                const note = document.getElementById('wNote')?.value.trim() || 'Transfer';
+                if (!to) { toast('⚠️ Enter recipient details'); return; }
+                if (!amt || amt <= 0) { toast('⚠️ Enter a valid amount'); return; }
+                if (amt > w.balance) { toast('❌ Insufficient wallet balance'); return; }
+                w.balance -= amt;
+                w.txns.push({ type: 'debit', desc: `${_modalMode === 'upi' ? 'UPI Pay' : 'Sent'} to ${to} · ${note}`, amount: amt, date: now });
+                saveWallet(w); refreshUI(); closeModal();
+                toast(`✅ ₹${amt.toLocaleString('en-IN')} sent to ${to}!`);
+
+            } else if (_modalMode === 'link') {
+                const bank = document.getElementById('wBank')?.value;
+                const accNum = document.getElementById('wAccNum')?.value;
+                const type = document.getElementById('wAccType')?.value;
+                if (!accNum || accNum.length < 8) { toast('⚠️ Enter a valid account number'); return; }
+                w.accounts.push({ bank, last4: accNum.slice(-4), type });
+                saveWallet(w); renderAccounts(w); closeModal();
+                toast(`✅ ${bank} account linked!`);
+            }
+        }
+
+        function copyUPI() {
+            const id = document.getElementById('upiId').textContent;
+            navigator.clipboard?.writeText(id).then(() => toast('✅ UPI ID copied!'));
+        }
+
+        refreshUI();
+    </script>
+</body>
+
+</html>

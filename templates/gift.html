@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Send a Gift — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <script src="/static/js/app.js?v=50"></script>
+    <style>
+        .gift-hero {
+            margin: 16px 16px 0;
+            background: linear-gradient(135deg, #1a1035, #110d27, #1a1035);
+            border: 1px solid rgba(139, 92, 246, .2);
+            border-radius: 20px;
+            padding: 28px 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .gift-hero::before {
+            content: '';
+            position: absolute;
+            top: -40px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 200px;
+            height: 200px;
+            background: radial-gradient(circle, rgba(139, 92, 246, .12), transparent 70%);
+        }
+
+        .amount-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 10px;
+            padding: 0 16px 4px;
+        }
+
+        .amt-btn {
+            padding: 13px;
+            background: #111827;
+            border: 1.5px solid rgba(255, 255, 255, .08);
+            border-radius: 12px;
+            color: #94a3b8;
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: center;
+            transition: all .2s;
+        }
+
+        .amt-btn.selected,
+        .amt-btn:hover {
+            background: rgba(139, 92, 246, .12);
+            border-color: rgba(139, 92, 246, .4);
+            color: #a78bfa;
+        }
+
+        .gift-card-preview {
+            margin: 0 16px 12px;
+            padding: 22px;
+            background: linear-gradient(135deg, #7c3aed, #6d28d9);
+            border-radius: 16px;
+            position: relative;
+            overflow: hidden;
+            transition: all .3s;
+        }
+
+        .gift-card-preview::before {
+            content: '🎁';
+            position: absolute;
+            right: -10px;
+            top: -10px;
+            font-size: 80px;
+            opacity: .15;
+        }
+
+        .gc-from {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .6);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+        }
+
+        .gc-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .gc-amount {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: #fff;
+            line-height: 1;
+        }
+
+        .gc-msg {
+            font-size: 12px;
+            color: rgba(255, 255, 255, .7);
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        .gc-code {
+            font-size: 11px;
+            color: rgba(255, 255, 255, .5);
+            margin-top: 10px;
+            letter-spacing: 2px;
+            font-family: monospace;
+        }
+
+        .sent-list-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 13px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        .sent-list-item:last-child {
+            border-bottom: none;
+        }
+
+        .sl-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: rgba(139, 92, 246, .1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+        }
+
+        .sl-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .sl-date {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        .sl-amt {
+            font-size: 14px;
+            font-weight: 700;
+            color: #a78bfa;
+            margin-left: auto;
+        }
+
+        .custom-input-wrap {
+            padding: 0 16px 4px;
+        }
+
+        .custom-input-wrap input {
+            width: 100%;
+            padding: 11px 14px;
+            background: #111827;
+            border: 1.5px solid rgba(139, 92, 246, .3);
+            border-radius: 12px;
+            color: #a78bfa;
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            outline: none;
+            text-align: center;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 28px 16px;
+            color: #475569;
+            font-size: 13px;
+        }
+
+        .empty-state .e-ico {
+            font-size: 36px;
+            margin-bottom: 8px;
+        }
+
+        .theme-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 8px;
+            padding: 0 16px 12px;
+        }
+
+        .theme-btn {
+            padding: 12px 6px;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255, 255, 255, .07);
+            background: #111827;
+            text-align: center;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .theme-btn.selected,
+        .theme-btn:hover {
+            border-color: rgba(139, 92, 246, .4);
+            background: rgba(139, 92, 246, .1);
+        }
+
+        .theme-lbl {
+            font-size: 10px;
+            color: #64748b;
+            margin-top: 4px;
+            font-weight: 600;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">Send a Gift</div>
+                    <div class="header-sub">Surprise someone special 🎁</div>
+                </div>
+            </div>
+
+            <!-- Hero -->
+            <div class="gift-hero anim-fade-up">
+                <span style="font-size:52px;display:block;margin-bottom:12px;">🎁</span>
+                <div
+                    style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#f1f5f9;margin-bottom:6px;">
+                    Gift a FinanceAI Voucher</div>
+                <div style="font-size:13px;color:#64748b;line-height:1.5;">Send money &amp; gifts wrapped in
+                    style.<br>Redeemable on FinanceAI Wallet.</div>
+            </div>
+
+            <!-- Live Preview -->
+            <div class="section-title">
+                <h2>Live Preview</h2>
+            </div>
+            <div class="gift-card-preview" id="previewCard">
+                <div class="gc-from">From</div>
+                <div class="gc-name" id="gcFromName">You → Friend</div>
+                <div class="gc-amount" id="gcAmount">₹500</div>
+                <div class="gc-msg" id="gcMsg">"Wishing you financial freedom! 🎉"</div>
+                <div class="gc-code" id="gcCode">Code: FAI-XXXX-XXXX</div>
+            </div>
+
+            <!-- Theme -->
+            <div class="section-title">
+                <h2>Card Theme</h2>
+            </div>
+            <div class="theme-grid">
+                <div class="theme-btn selected" onclick="setTheme(this,'linear-gradient(135deg,#7c3aed,#6d28d9)')">🎁
+                    <div class="theme-lbl">Classic</div>
+                </div>
+                <div class="theme-btn" onclick="setTheme(this,'linear-gradient(135deg,#be185d,#9d174d)')">💖<div
+                        class="theme-lbl">Love</div>
+                </div>
+                <div class="theme-btn" onclick="setTheme(this,'linear-gradient(135deg,#0369a1,#0284c7)')">🎓<div
+                        class="theme-lbl">Graduate</div>
+                </div>
+                <div class="theme-btn" onclick="setTheme(this,'linear-gradient(135deg,#b45309,#d97706)')">🎂<div
+                        class="theme-lbl">Birthday</div>
+                </div>
+            </div>
+
+            <!-- Amount -->
+            <div class="section-title">
+                <h2>Choose Amount</h2>
+            </div>
+            <div class="amount-grid">
+                <button class="amt-btn" onclick="selectAmt(this,100)">₹100</button>
+                <button class="amt-btn selected" onclick="selectAmt(this,500)">₹500</button>
+                <button class="amt-btn" onclick="selectAmt(this,1000)">₹1,000</button>
+                <button class="amt-btn" onclick="selectAmt(this,2000)">₹2,000</button>
+                <button class="amt-btn" onclick="selectAmt(this,5000)">₹5,000</button>
+                <button class="amt-btn" onclick="selectAmt(this,'custom')">Custom</button>
+            </div>
+            <div class="custom-input-wrap" id="customWrap" style="display:none;">
+                <input type="number" id="customAmt" placeholder="Enter amount" oninput="updatePreviewAmt(this.value)" />
+            </div>
+
+            <!-- Recipient -->
+            <div class="section-title">
+                <h2>Recipient Details</h2>
+            </div>
+            <div class="app-card">
+                <div class="app-card-body">
+                    <div class="mob-form-field">
+                        <label class="mob-form-label">Recipient Name</label>
+                        <input class="mob-form-input" id="recipientName" placeholder="Friend's name"
+                            oninput="updatePreviewName(this.value)">
+                    </div>
+                    <div class="mob-form-field">
+                        <label class="mob-form-label">Phone / Email</label>
+                        <input class="mob-form-input" id="recipientContact" placeholder="Mobile number or email">
+                    </div>
+                    <div class="mob-form-field" style="margin-bottom:0;">
+                        <label class="mob-form-label">Personal Message</label>
+                        <input class="mob-form-input" id="giftMsg" placeholder="Write a heartfelt message..."
+                            oninput="updatePreviewMsg(this.value)">
+                    </div>
+                </div>
+            </div>
+
+            <div style="padding:4px 16px 20px;">
+                <button class="btn-primary-app" onclick="sendGift()"
+                    style="background:linear-gradient(135deg,#7c3aed,#6d28d9);box-shadow:0 6px 20px rgba(124,58,237,.3);">
+                    🎁 Send Gift Voucher
+                </button>
+            </div>
+
+            <!-- Sent History -->
+            <div class="section-title">
+                <h2>Sent Gifts</h2>
+            </div>
+            <div class="app-card" id="sentList">
+                <div class="empty-state">
+                    <div class="e-ico">📭</div>
+                    <div>No gifts sent yet</div>
+                </div>
+            </div>
+            <div style="height:20px;"></div>
+
+        </div>
+    </div>
+
+    <script>
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+        const GK = 'financeai_gifts';
+
+        function toast(m) {
+            let t = document.querySelector('.app-toast');
+            if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); }
+            t.textContent = m; t.classList.add('show');
+            clearTimeout(t._t); t._t = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        let selectedAmt = 500, senderName = 'You';
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            const raw = p.sub?.split('@')[0];
+            senderName = raw?.split(/[._]/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ') || 'You';
+            const saved = JSON.parse(localStorage.getItem('financeai_profile_extra') || '{}');
+            if (saved.name) senderName = saved.name;
+        } catch (e) { }
+
+        document.getElementById('gcFromName').textContent = senderName + ' → Friend';
+
+        function setTheme(btn, grad) {
+            document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            document.getElementById('previewCard').style.background = grad;
+        }
+
+        function selectAmt(btn, val) {
+            document.querySelectorAll('.amt-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            const cw = document.getElementById('customWrap');
+            if (val === 'custom') { cw.style.display = 'block'; return; }
+            cw.style.display = 'none';
+            selectedAmt = val;
+            document.getElementById('gcAmount').textContent = '₹' + val.toLocaleString('en-IN');
+        }
+
+        function updatePreviewAmt(v) {
+            selectedAmt = parseFloat(v) || 0;
+            document.getElementById('gcAmount').textContent = selectedAmt ? '₹' + selectedAmt.toLocaleString('en-IN') : '₹—';
+        }
+        function updatePreviewName(v) {
+            document.getElementById('gcFromName').textContent = senderName + ' → ' + (v || 'Friend');
+        }
+        function updatePreviewMsg(v) {
+            document.getElementById('gcMsg').textContent = '"' + (v || 'Wishing you financial freedom! 🎉') + '"';
+        }
+
+        function genCode() {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+            return 'FAI-' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('') + '-' + Array.from({ length: 4 }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        }
+
+        function sendGift() {
+            const name = document.getElementById('recipientName').value.trim();
+            const contact = document.getElementById('recipientContact').value.trim();
+            const msg = document.getElementById('giftMsg').value.trim();
+            if (!name) { toast('⚠️ Please enter recipient name'); return; }
+            if (!contact) { toast('⚠️ Please enter phone or email'); return; }
+            if (!selectedAmt || selectedAmt <= 0) { toast('⚠️ Please choose an amount'); return; }
+
+            const code = genCode();
+            document.getElementById('gcCode').textContent = 'Code: ' + code;
+
+            const gifts = JSON.parse(localStorage.getItem(GK) || '[]');
+            gifts.push({
+                name, contact, msg, amount: selectedAmt, code,
+                date: new Date().toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })
+            });
+            localStorage.setItem(GK, JSON.stringify(gifts));
+            renderSent();
+
+            // Reset form
+            document.getElementById('recipientName').value = '';
+            document.getElementById('recipientContact').value = '';
+            document.getElementById('giftMsg').value = '';
+            document.getElementById('gcFromName').textContent = senderName + ' → Friend';
+            document.getElementById('gcMsg').textContent = '"Wishing you financial freedom! 🎉"';
+
+            toast('🎁 Gift voucher sent to ' + name + '! Code: ' + code);
+        }
+
+        function renderSent() {
+            const gifts = JSON.parse(localStorage.getItem(GK) || '[]');
+            const list = document.getElementById('sentList');
+            if (!gifts.length) {
+                list.innerHTML = '<div class="empty-state"><div class="e-ico">📭</div><div>No gifts sent yet</div></div>';
+                return;
+            }
+            list.innerHTML = gifts.slice().reverse().map(g => `
+                <div class="sent-list-item">
+                    <div class="sl-icon">🎁</div>
+                    <div>
+                        <div class="sl-name">To ${g.name}</div>
+                        <div class="sl-date">${g.date} · ${g.code}</div>
+                    </div>
+                    <div class="sl-amt">₹${g.amount.toLocaleString('en-IN')}</div>
+                </div>`).join('');
+        }
+
+        renderSent();
+    </script>
+</body>
+
+</html>

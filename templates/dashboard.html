@@ -2,26 +2,225 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Dashboard — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/layout.css?v=10">
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=10">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="/static/js/app.js"></script>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=50">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="/static/js/app.js?v=50"></script>
     <style>
+        /* ── Controls ── */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 16px 4px;
+            flex-wrap: wrap;
+        }
+
+        @media(min-width:821px) {
+            .controls-row {
+                padding: 0 0 16px;
+            }
+        }
+
+        /* ── Custom Month Picker ── */
+        .month-select {
+            display: none;
+            /* hidden — custom dropdown replaces it */
+        }
+
+        .month-picker {
+            position: relative;
+            flex: 1;
+        }
+
+        @media(min-width:821px) {
+            .month-picker {
+                flex: unset;
+            }
+        }
+
+        .month-picker-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, .05);
+            border: 1.5px solid rgba(255, 255, 255, .10);
+            color: var(--text, #e2e8f0);
+            padding: 9px 14px;
+            border-radius: 12px;
+            font-family: 'Nunito', sans-serif;
+            font-size: 13.5px;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            transition: all .2s;
+            white-space: nowrap;
+            min-width: 130px;
+            justify-content: space-between;
+        }
+
+        .month-picker-btn:hover {
+            background: rgba(255, 255, 255, .08);
+            border-color: rgba(245, 200, 66, .3);
+        }
+
+        .month-picker-btn .mp-arrow {
+            font-size: 10px;
+            opacity: .6;
+            transition: transform .2s;
+        }
+
+        .month-picker-btn.open .mp-arrow {
+            transform: rotate(180deg);
+        }
+
+        .month-picker-dropdown {
+            display: none;
+            position: absolute;
+            top: calc(100% + 8px);
+            left: 0;
+            z-index: 200;
+            background: #141c2e;
+            border: 1.5px solid rgba(255, 255, 255, .08);
+            border-radius: 16px;
+            padding: 8px;
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .5), 0 0 0 1px rgba(255, 255, 255, .04);
+            min-width: 220px;
+            backdrop-filter: blur(20px);
+        }
+
+        .month-picker-dropdown.open {
+            display: block;
+            animation: mpDrop .2s cubic-bezier(.16, 1, .3, 1);
+        }
+
+        @keyframes mpDrop {
+            from {
+                opacity: 0;
+                transform: translateY(-8px) scale(.97);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .mp-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 4px;
+        }
+
+        .mp-item {
+            padding: 10px 6px;
+            border-radius: 10px;
+            text-align: center;
+            font-family: 'Nunito', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            color: #94a3b8;
+            cursor: pointer;
+            transition: all .15s;
+            border: 1.5px solid transparent;
+        }
+
+        .mp-item:hover {
+            background: rgba(255, 255, 255, .06);
+            color: #e2e8f0;
+        }
+
+        .mp-item.active {
+            background: linear-gradient(135deg, var(--gold, #f5c842), #e8a820);
+            color: #0a0d14;
+            border-color: transparent;
+            box-shadow: 0 4px 12px rgba(245, 200, 66, .3);
+        }
+
+        .mp-item.current {
+            border-color: rgba(245, 200, 66, .35);
+            color: var(--gold, #f5c842);
+        }
+
+        .mp-item.current.active {
+            border-color: transparent;
+        }
+
+        /* Light mode overrides */
+        body.light-mode .month-picker-btn {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, .1);
+            color: #0f172a;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .06);
+        }
+
+        body.light-mode .month-picker-btn:hover {
+            border-color: rgba(212, 160, 23, .4);
+            background: #fffef7;
+        }
+
+        body.light-mode .month-picker-dropdown {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, .08);
+            box-shadow: 0 16px 48px rgba(0, 0, 0, .15);
+        }
+
+        body.light-mode .mp-item {
+            color: #64748b;
+        }
+
+        body.light-mode .mp-item:hover {
+            background: rgba(0, 0, 0, .04);
+            color: #0f172a;
+        }
+
+        .view-toggle {
+            display: flex;
+            gap: 4px;
+            background: rgba(255, 255, 255, .04);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 10px;
+            padding: 3px;
+        }
+
+        .view-btn {
+            padding: 6px 14px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            color: #64748b;
+            font-family: 'Nunito', sans-serif;
+            font-size: 12.5px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .view-btn.active {
+            background: linear-gradient(135deg, #f5c842, #e8a820);
+            color: #0a0d14;
+        }
+
+        /* ── Smart bar ── */
         .smart-bar {
             display: flex;
             align-items: center;
-            gap: 14px;
-            background: rgba(201, 168, 76, 0.07);
-            border: 1px solid rgba(201, 168, 76, 0.2);
+            gap: 10px;
+            background: rgba(245, 200, 66, .05);
+            border: 1.5px solid rgba(245, 200, 66, .15);
             border-radius: 14px;
-            padding: 14px 20px;
-            margin-bottom: 16px;
+            padding: 12px 14px;
+            margin: 10px 16px 0;
         }
 
-        .smart-bar-icon {
-            font-size: 20px;
-            flex-shrink: 0;
+        @media(min-width:821px) {
+            .smart-bar {
+                margin: 0 0 14px;
+            }
         }
 
         .smart-input {
@@ -29,42 +228,49 @@
             background: transparent;
             border: none;
             outline: none;
-            color: #e2e8f0;
-            font-size: 14.5px;
-            font-family: 'DM Sans', sans-serif;
+            color: #f1f5f9;
+            font-size: 13.5px;
+            font-family: 'Nunito', sans-serif;
+            font-weight: 600;
         }
 
         .smart-input::placeholder {
-            color: #475569;
+            color: #334155;
         }
 
         .smart-send-btn {
             padding: 8px 18px;
-            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            background: linear-gradient(135deg, #f5c842, #e8a820);
             border: none;
-            border-radius: 8px;
-            color: #0e0c06;
-            font-weight: 700;
+            border-radius: 10px;
+            color: #0a0d14;
+            font-weight: 800;
             font-size: 13px;
             cursor: pointer;
-            font-family: 'DM Sans', sans-serif;
-            transition: transform 0.15s, box-shadow 0.15s;
+            font-family: 'Nunito', sans-serif;
+            transition: transform .15s;
+            white-space: nowrap;
         }
 
         .smart-send-btn:hover {
             transform: translateY(-1px);
-            box-shadow: 0 4px 14px rgba(201, 168, 76, 0.3);
         }
 
         .smart-feedback {
             display: none;
             align-items: center;
             gap: 10px;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border-radius: 10px;
             font-size: 13px;
-            margin-bottom: 16px;
-            animation: fadeUp 0.3s ease;
+            margin: 8px 16px 0;
+            line-height: 1.5;
+        }
+
+        @media(min-width:821px) {
+            .smart-feedback {
+                margin: 8px 0 0;
+            }
         }
 
         .smart-feedback.show {
@@ -72,265 +278,73 @@
         }
 
         .smart-feedback.success {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            color: #22c55e;
+            background: rgba(16, 185, 129, .08);
+            border: 1px solid rgba(16, 185, 129, .18);
+            color: #10b981;
         }
 
         .smart-feedback.warning {
-            background: rgba(245, 158, 11, 0.1);
-            border: 1px solid rgba(245, 158, 11, 0.25);
+            background: rgba(245, 158, 11, .08);
+            border: 1px solid rgba(245, 158, 11, .2);
             color: #f59e0b;
         }
 
         .smart-feedback.danger {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            color: #ef4444;
+            background: rgba(244, 63, 94, .08);
+            border: 1px solid rgba(244, 63, 94, .18);
+            color: #f43f5e;
         }
 
-        .controls-row {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
-        }
-
-        .month-select {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            color: #e2e8f0;
-            padding: 8px 14px;
-            border-radius: 9px;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            cursor: pointer;
-            outline: none;
-        }
-
-        .view-toggle {
-            display: flex;
-            gap: 6px;
-        }
-
-        .view-btn {
-            padding: 8px 18px;
-            border-radius: 9px;
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            background: rgba(255, 255, 255, 0.04);
-            color: #64748b;
-            font-family: 'DM Sans', sans-serif;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .view-btn.active {
-            background: linear-gradient(135deg, #c9a84c, #e8c872);
-            color: #0e0c06;
-            font-weight: 700;
-            border-color: transparent;
-        }
-
-        .prediction-strip {
+        /* ── Prediction card ── */
+        .pred-card {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 12px 18px;
-            background: rgba(99, 209, 255, 0.05);
-            border: 1px solid rgba(99, 209, 255, 0.12);
-            border-radius: 10px;
-            margin-bottom: 22px;
-            font-size: 13px;
             gap: 12px;
+            padding: 14px 16px;
             flex-wrap: wrap;
         }
 
-        .pred-label {
-            color: #64748b;
-        }
-
-        .pred-value {
-            color: #63d1ff;
-            font-weight: 700;
-            font-size: 15px;
-        }
-
-        .pred-msg {
-            color: #94a3b8;
-            font-size: 12.5px;
-            flex: 1;
-            text-align: right;
-        }
-
-        .charts-row {
-            display: grid;
-            grid-template-columns: 1fr 320px;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
-
-        .chart-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            padding: 22px;
-        }
-
-        .chart-card h3 {
-            font-size: 13.5px;
-            font-weight: 600;
-            color: #94a3b8;
-            letter-spacing: 0.3px;
-            margin-bottom: 16px;
-        }
-
-        .chart-container {
-            height: 260px;
-        }
-
-        .bottom-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 22px;
-            margin-bottom: 22px;
-        }
-
-        .txn-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 9px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-            font-size: 13px;
-        }
-
-        .txn-item:last-child {
-            border-bottom: none;
-        }
-
-        .txn-left {
+        .pred-left {
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .txn-icon {
-            width: 30px;
-            height: 30px;
-            border-radius: 7px;
+        .pred-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: rgba(245, 200, 66, .1);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 13px;
-            background: rgba(255, 255, 255, 0.05);
+            font-size: 18px;
             flex-shrink: 0;
         }
 
-        .txn-cat {
-            font-weight: 500;
-            color: #e2e8f0;
-            text-transform: capitalize;
+        /* ── Charts grid ── */
+        .charts-two {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
         }
 
-        .txn-date {
-            font-size: 10.5px;
-            color: #475569;
+        @media(min-width:821px) {
+            .charts-two {
+                grid-template-columns: 1fr 300px;
+            }
         }
 
-        .txn-amount.income {
-            color: #22c55e;
-            font-weight: 700;
-        }
-
-        .txn-amount.expense {
-            color: #f87171;
-            font-weight: 700;
-        }
-
-        .budget-item {
-            margin-bottom: 14px;
-        }
-
-        .budget-header {
-            display: flex;
-            justify-content: space-between;
-            font-size: 12px;
-            margin-bottom: 5px;
-        }
-
-        .budget-cat {
-            font-weight: 600;
-            color: #e2e8f0;
-            text-transform: capitalize;
-        }
-
-        .budget-pct {
-            color: #64748b;
-        }
-
-        .progress-bar {
-            height: 6px;
-            background: rgba(255, 255, 255, 0.06);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.5s ease;
-        }
-
-        /* ── AI Bot ── */
-        .bot-panel {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(201, 168, 76, 0.15);
-            border-radius: 16px;
-            padding: 22px;
-            margin-bottom: 24px;
-        }
-
-        .bot-header {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 14px;
-        }
-
-        .bot-avatar {
-            width: 36px;
-            height: 36px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #c9a84c, #e8c872);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 17px;
-        }
-
-        .bot-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #e2e8f0;
-        }
-
-        .bot-subtitle {
-            font-size: 11px;
-            color: #475569;
-        }
-
+        /* ── Bot ── */
         .bot-messages {
-            min-height: 200px;
-            max-height: 260px;
+            min-height: 150px;
+            max-height: 220px;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-bottom: 14px;
-            padding-right: 2px;
+            gap: 8px;
+            margin-bottom: 12px;
         }
 
         .bot-messages::-webkit-scrollbar {
@@ -338,35 +352,36 @@
         }
 
         .bot-messages::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, .08);
             border-radius: 2px;
         }
 
         .msg {
-            max-width: 85%;
-            padding: 9px 13px;
-            border-radius: 12px;
+            max-width: 88%;
+            padding: 10px 14px;
+            border-radius: 14px;
             font-size: 13px;
-            line-height: 1.55;
-            animation: fadeUp 0.25s ease;
-        }
-
-        .msg.user {
-            align-self: flex-end;
-            background: rgba(201, 168, 76, 0.14);
-            border: 1px solid rgba(201, 168, 76, 0.2);
-            color: #e8c872;
+            line-height: 1.6;
         }
 
         .msg.bot {
-            align-self: flex-start;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: rgba(255, 255, 255, .05);
             color: #e2e8f0;
+            align-self: flex-start;
+            border-radius: 4px 14px 14px 14px;
+            border: 1px solid rgba(255, 255, 255, .06);
+        }
+
+        .msg.user {
+            background: linear-gradient(135deg, #f5c842, #e8a820);
+            color: #0a0d14;
+            align-self: flex-end;
+            border-radius: 14px 14px 4px 14px;
+            font-weight: 700;
         }
 
         .msg.typing {
-            color: #475569;
+            opacity: .6;
             font-style: italic;
         }
 
@@ -377,123 +392,133 @@
 
         .bot-input {
             flex: 1;
+            background: rgba(255, 255, 255, .04);
+            border: 1.5px solid rgba(255, 255, 255, .07);
+            border-radius: 12px;
             padding: 10px 14px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 9px;
-            color: #e2e8f0;
-            font-family: 'DM Sans', sans-serif;
+            color: #f1f5f9;
             font-size: 13px;
+            font-family: 'Nunito', sans-serif;
             outline: none;
-            transition: border-color 0.2s;
+            transition: border-color .2s;
         }
 
         .bot-input:focus {
-            border-color: rgba(201, 168, 76, 0.35);
-        }
-
-        .bot-input::placeholder {
-            color: #3d4860;
+            border-color: rgba(245, 200, 66, .4);
         }
 
         .bot-send {
-            padding: 10px 16px;
-            background: linear-gradient(135deg, #c9a84c, #e8c872);
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #f5c842, #e8a820);
             border: none;
-            border-radius: 9px;
-            color: #0e0c06;
-            font-weight: 700;
-            font-size: 15px;
+            border-radius: 12px;
+            color: #0a0d14;
+            font-size: 17px;
             cursor: pointer;
-            transition: transform 0.15s;
+            flex-shrink: 0;
+            transition: transform .15s;
         }
 
         .bot-send:hover {
             transform: scale(1.06);
         }
 
-        @keyframes fadeUp {
-            from {
-                opacity: 0;
-                transform: translateY(8px);
+        /* ── Skeleton ── */
+        .skeleton {
+            background: linear-gradient(90deg, rgba(255, 255, 255, .04) 0%, rgba(255, 255, 255, .08) 50%, rgba(255, 255, 255, .04) 100%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
+        }
+
+        @keyframes shimmer {
+            0% {
+                background-position: 200% 0
             }
 
-            to {
-                opacity: 1;
-                transform: translateY(0);
+            100% {
+                background-position: -200% 0
             }
-        }
-
-        /* Category icon colors */
-        .ci-food {
-            background: rgba(239, 68, 68, 0.15);
-        }
-
-        .ci-transport {
-            background: rgba(99, 209, 255, 0.12);
-        }
-
-        .ci-shopping {
-            background: rgba(167, 139, 250, 0.15);
-        }
-
-        .ci-entertainment {
-            background: rgba(251, 191, 36, 0.12);
-        }
-
-        .ci-sports {
-            background: rgba(34, 197, 94, 0.12);
-        }
-
-        .ci-health {
-            background: rgba(244, 114, 182, 0.12);
-        }
-
-        .ci-utilities {
-            background: rgba(148, 163, 184, 0.1);
-        }
-
-        .ci-assets {
-            background: rgba(201, 168, 76, 0.15);
-        }
-
-        .ci-income {
-            background: rgba(34, 197, 94, 0.12);
-        }
-
-        .ci-other {
-            background: rgba(255, 255, 255, 0.05);
         }
     </style>
 </head>
 
 <body>
     <div class="app-layout">
-
         {% include "sidebar.html" %}
 
-        <div class="page-wrapper">
+        <div class="page-wrapper app-content">
 
-            <div class="topnav">
-                <div class="logo">FinanceAI</div>
+            <!-- Mobile sticky header -->
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">Dashboard</div>
+                    <div class="header-sub" id="headerDate">Your financial command center</div>
+                </div>
+                <div style="display:flex;gap:8px;">
+                    <div class="header-action-btn" title="Pick Month" style="cursor:pointer;"
+                        onclick="document.getElementById('monthSelector').focus();document.getElementById('monthSelector').click();">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" />
+                            <line x1="16" y1="2" x2="16" y2="6" />
+                            <line x1="8" y1="2" x2="8" y2="6" />
+                            <line x1="3" y1="10" x2="21" y2="10" />
+                        </svg>
+                    </div>
+                    <a href="/notifications" class="header-action-btn" title="Notifications" style="position:relative;">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                            stroke-linecap="round">
+                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+                            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+                        </svg>
+                        <span id="notifBadge"
+                            style="position:absolute;top:6px;right:6px;width:7px;height:7px;background:#f43f5e;border-radius:50%;display:none;border:1.5px solid #0a0d14;"></span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Desktop topnav -->
+            <div class="topnav" style="display:none;" id="desktopTopnav">
+                <div style="font-family:'Sora',sans-serif;font-size:20px;font-weight:700;color:#f1f5f9;">Dashboard</div>
                 <input class="search-box" placeholder="Search transactions..." id="searchBox" />
             </div>
 
-            <div class="page-header">
-                <h1>Revenue Command Center</h1>
-                <p>Real-time financial intelligence & AI decision engine.</p>
+            <!-- ═══ HERO BALANCE CARD ═══ -->
+            <div class="hero-balance-card anim-fade-up">
+                <div class="hero-greeting">Good morning 👋</div>
+                <div class="hero-name" id="heroName">Loading...</div>
+                <div class="hero-balance-label">NET WORTH</div>
+                <div class="hero-balance-amount hide-amount" id="kpi4Value">₹—</div>
+                <div class="hero-balance-row stagger">
+                    <div class="hero-mini-stat">
+                        <div class="hero-mini-stat-icon" style="background:rgba(16,185,129,.12);">💰</div>
+                        <div class="hero-mini-stat-info">
+                            <div class="hero-mini-stat-label">Income</div>
+                            <div class="hero-mini-stat-val hide-amount" style="color:#10b981;" id="kpi1Value">₹—</div>
+                            <div style="font-size:9px;margin-top:1px;" id="kpi1Trend"></div>
+                        </div>
+                    </div>
+                    <div class="hero-mini-stat">
+                        <div class="hero-mini-stat-icon" style="background:rgba(244,63,94,.12);">💸</div>
+                        <div class="hero-mini-stat-info">
+                            <div class="hero-mini-stat-label">Expense</div>
+                            <div class="hero-mini-stat-val hide-amount" style="color:#f43f5e;" id="kpi2Value">₹—</div>
+                            <div style="font-size:9px;margin-top:1px;" id="kpi2Trend"></div>
+                        </div>
+                    </div>
+                    <div class="hero-mini-stat">
+                        <div class="hero-mini-stat-icon" style="background:rgba(245,200,66,.12);">📈</div>
+                        <div class="hero-mini-stat-info">
+                            <div class="hero-mini-stat-label">Savings</div>
+                            <div class="hero-mini-stat-val hide-amount" style="color:#f5c842;" id="kpi3Value">₹—</div>
+                            <div style="font-size:9px;margin-top:1px;" id="kpi3Trend"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-            <!-- SMART BAR -->
-            <div class="smart-bar">
-                <span class="smart-bar-icon">⚡</span>
-                <input type="text" id="smartInput" class="smart-input"
-                    placeholder="e.g. 'Paid 500 for swiggy' · 'Received 20000 salary' · 'Bought gold 10000'" />
-                <button class="smart-send-btn" onclick="submitSmartTransaction()">Add →</button>
-            </div>
-            <div class="smart-feedback" id="smartFeedback"></div>
-
-            <!-- CONTROLS -->
+            <!-- ═══ CONTROLS ═══ -->
             <div class="controls-row">
                 <select class="month-select" id="monthSelector" onchange="loadDashboard()">
                     <option value="1">January</option>
@@ -509,102 +534,242 @@
                     <option value="11">November</option>
                     <option value="12">December</option>
                 </select>
+
+                <!-- Custom Month Picker -->
+                <div class="month-picker" id="monthPickerWrap">
+                    <button class="month-picker-btn" id="monthPickerBtn" onclick="toggleMonthPicker(event)">
+                        <span id="monthPickerLabel">📅 March</span>
+                        <span class="mp-arrow">▼</span>
+                    </button>
+                    <div class="month-picker-dropdown" id="monthPickerDropdown">
+                        <div class="mp-grid" id="mpGrid"></div>
+                    </div>
+                </div>
                 <div class="view-toggle">
                     <button class="view-btn active" id="monthlyBtn" onclick="setView('monthly')">Monthly</button>
                     <button class="view-btn" id="overallBtn" onclick="setView('overall')">Overall</button>
                 </div>
             </div>
 
-            <!-- PREDICTION STRIP -->
-            <div class="prediction-strip">
-                <span class="pred-label">🔮 Month-end Savings Forecast</span>
-                <span class="pred-value" id="predictionValue">₹—</span>
-                <span class="pred-msg" id="predictionMsg">Calculating...</span>
+            <!-- ═══ SMART ADD ═══ -->
+            <div class="smart-bar">
+                <span style="font-size:20px;flex-shrink:0;">⚡</span>
+                <input type="text" id="smartInput" class="smart-input"
+                    placeholder="e.g. 'Paid ₹500 for Swiggy' or 'Salary 45000'" />
+                <button class="smart-send-btn" onclick="submitSmartTransaction()">Add →</button>
             </div>
+            <div class="smart-feedback" id="smartFeedback"></div>
 
-            <!-- KPI GRID -->
-            <div class="kpi-grid" style="margin-bottom:22px;">
-                <div class="kpi-card">
-                    <h4 id="kpi1Title">Monthly Income</h4>
-                    <h2 id="kpi1Value">₹0</h2>
-                </div>
-                <div class="kpi-card">
-                    <h4 id="kpi2Title">Monthly Expense</h4>
-                    <h2 id="kpi2Value">₹0</h2>
-                </div>
-                <div class="kpi-card">
-                    <h4 id="kpi3Title">Savings</h4>
-                    <h2 id="kpi3Value">₹0</h2>
-                </div>
-                <div class="kpi-card highlight">
-                    <h4 id="kpi4Title">Net Worth</h4>
-                    <h2 id="kpi4Value">₹0</h2>
-                </div>
-            </div>
-
-            <!-- CHARTS -->
-            <div class="charts-row">
-                <div class="chart-card">
-                    <h3>📈 Income vs Expense Trend</h3>
-                    <div class="chart-container"><canvas id="trendChart"></canvas></div>
-                </div>
-                <div class="chart-card">
-                    <h3>🍩 Expense by Category</h3>
-                    <div class="chart-container"><canvas id="donutChart"></canvas></div>
-                </div>
-            </div>
-
-            <!-- BOTTOM ROW -->
-            <div class="bottom-row">
-                <div class="chart-card">
-                    <h3>🕐 Recent Transactions</h3>
-                    <div id="historyList"></div>
-                </div>
-                <div class="chart-card">
-                    <h3>🎯 Budget Status</h3>
-                    <div id="budgetList"></div>
-                </div>
-            </div>
-
-            <!-- NEWS INSIGHTS WIDGET -->
-            <div class="bot-panel" id="newsInsightsPanel" style="margin-bottom:20px;">
-                <div class="bot-header">
-                    <div class="bot-avatar">📰</div>
-                    <div>
-                        <div class="bot-title">Live News Financial Insights</div>
-                        <div class="bot-subtitle" id="newsFetchedAt">Powered by Indian Finance News · Loading...</div>
+            <!-- ═══ FORECAST STRIP ═══ -->
+            <div style="padding:10px 16px 0;" id="forecastWrap">
+                <div class="app-card" style="margin:0;">
+                    <div class="pred-card">
+                        <div class="pred-left">
+                            <div class="pred-icon">🔮</div>
+                            <div>
+                                <div
+                                    style="font-size:10.5px;color:#475569;font-weight:700;text-transform:uppercase;letter-spacing:.5px;">
+                                    Month-End Forecast</div>
+                                <div style="font-size:13px;color:#94a3b8;margin-top:2px;" id="predictionMsg">
+                                    Calculating...</div>
+                            </div>
+                        </div>
+                        <div style="font-family:'Sora',sans-serif;font-size:22px;font-weight:800;" id="predictionValue">
+                            ₹—</div>
                     </div>
                 </div>
-                <div id="newsInsightsList" style="padding: 8px 0;">
-                    <div style="color:#888; font-size:13px; padding:10px;">Fetching latest news insights...</div>
-                </div>
             </div>
 
-            <!-- AI BOT -->
-            <div class="bot-panel">
-                <div class="bot-header">
-                    <div class="bot-avatar">🤖</div>
-                    <div>
-                        <div class="bot-title">FinanceAI Advisor</div>
-                        <div class="bot-subtitle">Powered by Groq AI · Has your full financial context</div>
+            <!-- ═══ QUICK ACTIONS ═══ -->
+            <div class="section-title" style="padding-top:14px;">
+                <h2>Quick Actions</h2>
+            </div>
+            <div class="quick-actions stagger">
+                <a href="/transactions" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(16,185,129,.1);border-color:rgba(16,185,129,.2);">💰
+                    </div>
+                    <span class="qa-label">Add Txn</span>
+                </a>
+                <a href="/analytics" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(59,130,246,.1);border-color:rgba(59,130,246,.2);">📊
+                    </div>
+                    <span class="qa-label">Analytics</span>
+                </a>
+                <a href="/budgets" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(245,200,66,.1);border-color:rgba(245,200,66,.2);">🎯
+                    </div>
+                    <span class="qa-label">Budgets</span>
+                </a>
+                <a href="/ai" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(139,92,246,.1);border-color:rgba(139,92,246,.2);">🤖
+                    </div>
+                    <span class="qa-label">AI</span>
+                </a>
+                <a href="/wealth" class="qa-item">
+                    <div class="qa-icon" style="background:rgba(244,63,94,.1);border-color:rgba(244,63,94,.2);">💎</div>
+                    <span class="qa-label">Wealth</span>
+                </a>
+            </div>
+
+            <!-- ═══ CHARTS ═══ -->
+            <div class="section-title">
+                <h2>Spending Overview</h2>
+            </div>
+            <div class="charts-two" style="padding:0 16px;gap:12px;" id="chartsSection">
+                <div class="app-card" style="margin:0;">
+                    <div class="app-card-header">
+                        <span class="app-card-title">📈 Income vs Expense</span>
+                        <span style="font-size:10px;color:#334155;font-weight:700;">6 months</span>
+                    </div>
+                    <div class="app-card-body">
+                        <div class="chart-wrap chart-wrap-tall"><canvas id="trendChart"></canvas></div>
                     </div>
                 </div>
-                <div class="bot-messages" id="botMessages">
-                    <div class="msg bot">👋 Hi! I'm your personal AI finance advisor. I know your income, expenses,
-                        assets, budgets and net worth. Ask me anything — "Can I buy a ₹25,000 phone?", "Should I invest
-                        in gold now?", "How do I improve my savings rate?"</div>
+                <div class="app-card" style="margin:0;">
+                    <div class="app-card-header">
+                        <span class="app-card-title">🍩 By Category</span>
+                        <span style="font-size:10px;color:#334155;font-weight:700;">This month</span>
+                    </div>
+                    <div class="app-card-body">
+                        <div class="chart-wrap"><canvas id="donutChart"></canvas></div>
+                    </div>
                 </div>
-                <div class="bot-input-row">
-                    <input type="text" class="bot-input" id="botInput"
-                        placeholder="Ask about your finances, investments, budgets..." />
-                    <button class="bot-send" onclick="sendBotMessage()">➤</button>
+            </div>
+            <div style="height:12px;"></div>
+
+            <!-- ═══ RECENT TRANSACTIONS ═══ -->
+            <div class="section-title">
+                <h2>Recent Transactions</h2>
+                <a href="/transactions">See all →</a>
+            </div>
+            <div class="app-card">
+                <div id="historyList"></div>
+            </div>
+
+            <!-- ═══ BUDGET STATUS ═══ -->
+            <div class="section-title">
+                <h2>Budget Status</h2>
+                <a href="/budgets">Manage →</a>
+            </div>
+            <div class="app-card">
+                <div id="budgetList"></div>
+            </div>
+
+            <!-- ═══ MARKET NEWS ═══ -->
+            <div class="section-title">
+                <h2>📰 Market Pulse</h2>
+            </div>
+            <div class="app-card">
+                <div class="app-card-header">
+                    <span class="app-card-title">Live Finance News</span>
+                    <span style="font-size:10px;color:#334155;" id="newsFetchedAt">Loading...</span>
+                </div>
+                <div id="newsInsightsList" style="padding:0;"></div>
+            </div>
+
+            <!-- ═══ AI BOT ═══ -->
+            <div class="section-title">
+                <h2>🤖 AI Finance Advisor</h2>
+            </div>
+            <div class="app-card" style="margin-bottom:8px;">
+                <div class="app-card-header" style="gap:10px;">
+                    <div
+                        style="width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,#f5c842,#e8a820);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;">
+                        🤖</div>
+                    <div>
+                        <div class="app-card-title">FinanceAI Advisor</div>
+                        <div style="font-size:11px;color:#475569;margin-top:1px;">Powered by Groq AI · Always here</div>
+                    </div>
+                    <div style="margin-left:auto;display:flex;align-items:center;gap:4px;">
+                        <div
+                            style="width:7px;height:7px;border-radius:50%;background:#10b981;box-shadow:0 0 6px #10b981;">
+                        </div>
+                        <span style="font-size:10px;color:#10b981;font-weight:700;">Online</span>
+                    </div>
+                </div>
+                <div class="app-card-body" style="padding-top:10px;">
+                    <div class="bot-messages" id="botMessages">
+                        <div class="msg bot">👋 Hi! I'm your AI finance advisor. Ask me anything —<br><em>"Can I afford
+                                a ₹25,000 phone?"</em><br><em>"How to improve my savings rate?"</em></div>
+                    </div>
+                    <div class="bot-input-row">
+                        <input type="text" class="bot-input" id="botInput" placeholder="Ask about your finances..." />
+                        <button class="bot-send" onclick="sendBotMessage()">➤</button>
+                    </div>
                 </div>
             </div>
 
         </div>
     </div>
 
-    <script src="/static/js/dashboard.js?v=10"></script>
+    <script>
+        // Desktop layout
+        if (window.innerWidth > 820) {
+            document.getElementById('desktopTopnav').style.display = 'flex';
+            document.querySelector('.app-page-header').style.display = 'none';
+            document.querySelector('.hero-balance-card').style.margin = '0 0 20px';
+            document.getElementById('chartsSection').style.padding = '0';
+            document.getElementById('forecastWrap').style.padding = '0 0 10px';
+        }
+
+        // Date in header
+        const now = new Date();
+        document.getElementById('headerDate').textContent = now.toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'short' });
+
+        // Set current month default
+        document.getElementById('monthSelector').value = now.getMonth() + 1;
+
+        // ── CUSTOM MONTH PICKER ──
+        const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June',
+            'July', 'August', 'September', 'October', 'November', 'December'];
+        const SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+            'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+        function buildMpGrid() {
+            const curMonth = now.getMonth() + 1; // 1-indexed current real month
+            const selVal = parseInt(document.getElementById('monthSelector').value) || curMonth;
+            const grid = document.getElementById('mpGrid');
+            grid.innerHTML = MONTHS.map((m, i) => {
+                const val = i + 1;
+                const isCur = val === curMonth;
+                const isSel = val === selVal;
+                return `<div class="mp-item${isSel ? ' active' : ''}${isCur && !isSel ? ' current' : ''}"
+                             data-val="${val}" onclick="selectMonth(${val})">${SHORT[i]}</div>`;
+            }).join('');
+        }
+
+        function selectMonth(val) {
+            document.getElementById('monthSelector').value = val;
+            document.getElementById('monthPickerLabel').textContent = '📅 ' + MONTHS[val - 1];
+            buildMpGrid();
+            closeMonthPicker();
+            loadDashboard();
+        }
+
+        function toggleMonthPicker(e) {
+            e.stopPropagation();
+            const btn = document.getElementById('monthPickerBtn');
+            const drop = document.getElementById('monthPickerDropdown');
+            const open = drop.classList.toggle('open');
+            btn.classList.toggle('open', open);
+            if (open) buildMpGrid();
+        }
+
+        function closeMonthPicker() {
+            document.getElementById('monthPickerDropdown').classList.remove('open');
+            document.getElementById('monthPickerBtn').classList.remove('open');
+        }
+
+        document.addEventListener('click', function (e) {
+            if (!document.getElementById('monthPickerWrap').contains(e.target)) closeMonthPicker();
+        });
+
+        // Init label
+        const initMonth = now.getMonth() + 1;
+        document.getElementById('monthPickerLabel').textContent = '📅 ' + MONTHS[initMonth - 1];
+
+    </script>
+    <script src="/static/js/dashboard.js?v=50"></script>
 </body>
 
 </html>

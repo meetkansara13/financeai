@@ -165,8 +165,8 @@ function renderBudgets(budgets, income) {
                 </div>
             </div>
             <div class="bc-amounts">
-                <span>Spent: <strong>${fmt(b.spent)}</strong></span>
-                <span>Limit: <strong>${fmt(b.limit)}</strong></span>
+                <span>Spent: <strong class="hide-amount">${fmt(b.spent)}</strong></span>
+                <span>Limit: <strong class="hide-amount">${fmt(b.limit)}</strong></span>
             </div>
             <div class="prog"><div class="prog-fill" style="width:${Math.min(pct,100)}%;background:${color};"></div></div>
             <div class="bc-foot">

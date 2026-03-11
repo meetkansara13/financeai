@@ -267,3 +267,98 @@ canvas {
     border-radius: 10px;
     transition: width 0.4s ease;
 }
+
+/* ===================================== */
+/* LIGHT MODE OVERRIDES                  */
+/* ===================================== */
+
+html.light-mode .page-wrapper {
+    background: linear-gradient(135deg, #f0f4f8 0%, #e8edf5 100%);
+    color: #0f172a;
+}
+
+html.light-mode .kpi-card {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+html.light-mode .kpi-card h4 {
+    color: #64748b;
+}
+
+html.light-mode .kpi-card h2 {
+    color: #0f172a;
+}
+
+html.light-mode .kpi-card:hover {
+    border-color: rgba(5, 150, 105, 0.4);
+    box-shadow: 0 10px 30px rgba(5, 150, 105, 0.12);
+}
+
+html.light-mode .left-panel,
+html.light-mode .right-panel {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+html.light-mode .left-panel:hover,
+html.light-mode .right-panel:hover {
+    border-color: rgba(5, 150, 105, 0.3);
+}
+
+html.light-mode .history-item {
+    border-bottom-color: rgba(0, 0, 0, 0.06);
+    color: #0f172a;
+}
+
+html.light-mode .history-item:hover {
+    color: #059669;
+}
+
+html.light-mode .smart-bar {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.07);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+html.light-mode .smart-bar:hover {
+    border-color: rgba(5, 150, 105, 0.4);
+}
+
+html.light-mode .smart-input {
+    color: #0f172a;
+}
+
+html.light-mode .smart-input::placeholder {
+    color: #94a3b8;
+}
+
+html.light-mode .view-toggle {
+    background: rgba(0, 0, 0, 0.04);
+    border-color: rgba(0, 0, 0, 0.07);
+}
+
+html.light-mode .view-btn {
+    color: #64748b;
+}
+
+html.light-mode .budget-section {
+    background: #f8fafc;
+    border: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+html.light-mode .progress-bar {
+    background: rgba(0, 0, 0, 0.06);
+}
+
+html.light-mode .month-filter label {
+    color: #64748b;
+}
+
+html.light-mode .month-filter select {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #0f172a;
+}

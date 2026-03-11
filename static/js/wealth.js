@@ -21,19 +21,43 @@ const setVal  = (id, v) => { const el = document.getElementById(id); if (el) el.
    STEP NAVIGATION
 ════════════════════════════ */
 function goToStep(n) {
+    // Check if jumping ahead with incomplete data — show warning badge, not block
+    if (n > currentStep) {
+        for (let s = currentStep; s < n; s++) {
+            if (!completedSteps.has(s)) {
+                // Mark as incomplete with orange warning instead of green done
+                const tab = document.getElementById(`tab-${s}`);
+                if (tab) {
+                    tab.classList.remove('active', 'done');
+                    tab.classList.add('incomplete');
+                    const numEl = tab.querySelector('.st-num');
+                    if (numEl) numEl.innerHTML = '!';
+                }
+            }
+        }
+    }
+
     document.querySelectorAll(".form-step").forEach(s => s.classList.remove("active"));
     document.querySelectorAll(".step-tab").forEach(t => t.classList.remove("active"));
 
     document.getElementById(`step-${n}`)?.classList.add("active");
     document.getElementById(`tab-${n}`)?.classList.add("active");
 
+    // Mark all completed steps as done (green check)
     for (let i = 1; i < n; i++) {
         const tab = document.getElementById(`tab-${i}`);
         if (tab) {
-            tab.classList.remove("active");
-            tab.classList.add("done");
-            const numEl = tab.querySelector(".st-num");
-            if (numEl) numEl.innerHTML = "✓";
+            tab.classList.remove("active", "incomplete");
+            if (completedSteps.has(i)) {
+                tab.classList.add("done");
+                const numEl = tab.querySelector(".st-num");
+                if (numEl) numEl.innerHTML = "✓";
+            } else {
+                // Not completed — show warning
+                tab.classList.add("incomplete");
+                const numEl = tab.querySelector(".st-num");
+                if (numEl) numEl.innerHTML = "!";
+            }
         }
     }
     currentStep = n;

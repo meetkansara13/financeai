@@ -2,9 +2,10 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta charset="UTF-8">
     <title>Smart Budget — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/layout.css?v=10">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/app.js"></script>
     <style>
@@ -777,6 +778,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
 </head>
 
 <body>
@@ -819,23 +821,23 @@
             <div class="kpi-strip">
                 <div class="kc">
                     <div class="kc-lbl">Monthly Income</div>
-                    <div class="kc-val g" id="kIncome">₹—</div>
+                    <div class="kc-val g hide-amount" id="kIncome">₹—</div>
                 </div>
                 <div class="kc">
                     <div class="kc-lbl">Total Budgeted</div>
-                    <div class="kc-val gold" id="kBudget">₹—</div>
+                    <div class="kc-val gold hide-amount" id="kBudget">₹—</div>
                 </div>
                 <div class="kc">
                     <div class="kc-lbl">Total Spent</div>
-                    <div class="kc-val" id="kSpent">₹—</div>
+                    <div class="kc-val hide-amount" id="kSpent">₹—</div>
                 </div>
                 <div class="kc">
                     <div class="kc-lbl">Remaining</div>
-                    <div class="kc-val" id="kRemain">₹—</div>
+                    <div class="kc-val hide-amount" id="kRemain">₹—</div>
                 </div>
                 <div class="kc">
                     <div class="kc-lbl">Savings Rate</div>
-                    <div class="kc-val" id="kSaving">—%</div>
+                    <div class="kc-val hide-amount" id="kSaving">—%</div>
                 </div>
             </div>
 
@@ -927,7 +929,211 @@
     </div>
 
     <div class="toast" id="toast"></div>
-    <script src="/static/js/budgets.js?v=10"></script>
+    <script src="/static/js/budgets.js?v=50"></script>
 </body>
 
 </html>
+<style>
+    /* ════════════════════════════════════════
+   BUDGETS — MOBILE RESPONSIVE
+════════════════════════════════════════ */
+    @media (max-width: 820px) {
+
+        /* ── Page wrapper ── */
+        .page-wrapper {
+            padding: 12px 14px 90px !important;
+        }
+
+        .page-header h1 {
+            font-size: 18px;
+        }
+
+        .page-header p {
+            font-size: 11px;
+        }
+
+        /* ── Top bar — stack vertically ── */
+        .top-bar {
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+            margin-bottom: 14px;
+        }
+
+        .top-bar .msel {
+            width: 100%;
+            font-size: 14px;
+            padding: 10px 13px;
+        }
+
+        .top-bar .btn-auto,
+        .top-bar .btn-add {
+            width: 100%;
+            text-align: center;
+            padding: 11px 16px;
+            font-size: 13px;
+        }
+
+        .top-bar .ai-pill {
+            align-self: flex-start;
+        }
+
+        /* ── KPI strip — 2 columns on mobile ── */
+        .kpi-strip {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 9px;
+            margin-bottom: 14px;
+        }
+
+        /* Make savings rate span full width */
+        .kpi-strip .kc:last-child {
+            grid-column: 1 / -1;
+        }
+
+        .kc {
+            padding: 12px 14px;
+            border-radius: 10px;
+        }
+
+        .kc-lbl {
+            font-size: 9.5px;
+        }
+
+        .kc-val {
+            font-size: 16px;
+        }
+
+        /* ── Setup banner ── */
+        .setup-banner {
+            padding: 18px 16px;
+            margin-bottom: 14px;
+        }
+
+        .sb-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+        }
+
+        .btn-gen {
+            width: 100%;
+            padding: 12px;
+        }
+
+        /* ── Budget cards — 1 column ── */
+        .budget-grid {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .bcard {
+            padding: 14px 15px;
+            border-radius: 11px;
+        }
+
+        .bc-edit {
+            top: 10px;
+            right: 10px;
+        }
+
+        /* ── Charts — stack vertically ── */
+        .chart-row {
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+
+        .cpanel {
+            padding: 16px;
+        }
+
+        .chart-wrap {
+            height: 210px;
+        }
+
+        /* ── AI Tips — 1 column ── */
+        .tips-grid {
+            grid-template-columns: 1fr;
+            gap: 9px;
+        }
+
+        .ai-tips {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        /* ── Investment panel — 2 columns ── */
+        .invest-panel {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .invest-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 9px;
+        }
+
+        .inv-card {
+            padding: 11px 10px;
+        }
+
+        /* ── Goals — 1 column ── */
+        .goals-panel {
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+
+        .goals-grid {
+            grid-template-columns: 1fr;
+            gap: 9px;
+        }
+
+        /* ── Modal — full width bottom sheet ── */
+        .modal-overlay {
+            align-items: flex-end;
+        }
+
+        .modal-box {
+            width: 100%;
+            border-radius: 18px 18px 0 0;
+            padding: 22px 20px 32px;
+            animation: slideUp .3s ease;
+        }
+
+        /* ── Toast — full width on mobile ── */
+        .toast {
+            top: auto;
+            bottom: 80px;
+            left: 14px;
+            right: 14px;
+            text-align: center;
+        }
+    }
+
+    /* ── Extra small phones ── */
+    @media (max-width: 380px) {
+        .kpi-strip {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .invest-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .kc-val {
+            font-size: 14px;
+        }
+    }
+
+    @keyframes slideUp {
+        from {
+            transform: translateY(100%);
+            opacity: 0;
+        }
+
+        to {
+            transform: translateY(0);
+            opacity: 1;
+        }
+    }
+</style>

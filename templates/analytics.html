@@ -2,9 +2,10 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Analytics — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/layout.css?v=10">
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=50">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
     <script src="/static/js/app.js"></script>
     <link
@@ -303,6 +304,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
 </head>
 
 <body>
@@ -327,22 +329,22 @@
             <div class="an-kpi">
                 <div class="an-kpi-card">
                     <div class="an-kpi-lbl">Total Income</div>
-                    <div class="an-kpi-val" id="kInc" style="color:#22c55e">₹0</div>
+                    <div class="an-kpi-val hide-amount" id="kInc" style="color:#22c55e">₹0</div>
                     <div class="an-kpi-sub" id="kIncSub">–</div>
                 </div>
                 <div class="an-kpi-card">
                     <div class="an-kpi-lbl">Total Expense</div>
-                    <div class="an-kpi-val" id="kExp" style="color:#f87171">₹0</div>
+                    <div class="an-kpi-val hide-amount" id="kExp" style="color:#f87171">₹0</div>
                     <div class="an-kpi-sub" id="kExpSub">–</div>
                 </div>
                 <div class="an-kpi-card">
                     <div class="an-kpi-lbl">Net Savings</div>
-                    <div class="an-kpi-val" id="kSav" style="color:#63d1ff">₹0</div>
+                    <div class="an-kpi-val hide-amount" id="kSav" style="color:#63d1ff">₹0</div>
                     <div class="an-kpi-sub" id="kSavSub">–</div>
                 </div>
                 <div class="an-kpi-card">
                     <div class="an-kpi-lbl">Savings Rate</div>
-                    <div class="an-kpi-val" id="kRate" style="color:#c9a84c">0%</div>
+                    <div class="an-kpi-val hide-amount" id="kRate" style="color:#c9a84c">0%</div>
                     <div class="an-kpi-sub">of monthly income</div>
                 </div>
                 <div class="an-kpi-card">

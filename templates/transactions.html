@@ -2,9 +2,10 @@
 <html lang="en">
 
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Transactions — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/layout.css?v=10">
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=3">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/dashboard.css?v=50">
     <script src="/static/js/app.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
@@ -350,6 +351,7 @@
             }
         }
     </style>
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
 </head>
 
 <body>
@@ -374,21 +376,21 @@
                     <div class="sum-ico" style="background:rgba(34,197,94,.1)">💰</div>
                     <div>
                         <div class="sum-lbl">Income</div>
-                        <div class="sum-val" id="sInc" style="color:#22c55e">₹0</div>
+                        <div class="sum-val hide-amount" id="sInc" style="color:#22c55e">₹0</div>
                     </div>
                 </div>
                 <div class="sum-card">
                     <div class="sum-ico" style="background:rgba(248,113,113,.1)">💸</div>
                     <div>
                         <div class="sum-lbl">Expense</div>
-                        <div class="sum-val" id="sExp" style="color:#f87171">₹0</div>
+                        <div class="sum-val hide-amount" id="sExp" style="color:#f87171">₹0</div>
                     </div>
                 </div>
                 <div class="sum-card">
                     <div class="sum-ico" style="background:rgba(99,209,255,.1)">📊</div>
                     <div>
                         <div class="sum-lbl">Net Savings</div>
-                        <div class="sum-val" id="sNet" style="color:#63d1ff">₹0</div>
+                        <div class="sum-val hide-amount" id="sNet" style="color:#63d1ff">₹0</div>
                     </div>
                 </div>
                 <div class="sum-card">
@@ -527,7 +529,7 @@
                     <div class="txn-sub">${t.category}</div>
                 </div>
                 <div class="txn-right">
-                    <div class="txn-amt ${t.type}">${isI ? "+" : "-"}${fmt(t.amount)}</div>
+                    <div class="txn-amt hide-amount ${t.type}">${isI ? "+" : "-"}${fmt(t.amount)}</div>
                     <div class="txn-date-sm">${d.toLocaleDateString("en-IN", { day: "numeric", month: "short" })}</div>
                 </div>
                 <button class="del-btn" onclick="del(${t.id})" title="Delete">🗑</button>

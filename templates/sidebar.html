@@ -1,124 +1,211 @@
+<!-- ═══════════════════════════════════
+     MOBILE TOP BAR
+════════════════════════════════════ -->
+<div class="mob-topbar" id="mobTopbar">
+    <a href="/dashboard" class="mob-brand" style="text-decoration:none;">
+        <div class="mob-brand-icon">
+            <svg width="18" height="18" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M6 28V16l6-5 6 4 6-8 6 6" stroke="#0a0d14" stroke-width="3" stroke-linecap="round"
+                    stroke-linejoin="round" />
+                <circle cx="28" cy="10" r="3" fill="#0a0d14" />
+                <path d="M6 28h24" stroke="#0a0d14" stroke-width="2.5" stroke-linecap="round" />
+            </svg>
+        </div>
+        <span>Finance<em>AI</em></span>
+    </a>
+    <button class="mob-hamburger" id="hamburgerBtn" onclick="toggleSidebar()" aria-label="Menu">
+        <span></span><span></span><span></span>
+    </button>
+</div>
+
+<!-- ═══════════════════════════════════
+     BACKDROP
+════════════════════════════════════ -->
+<div class="sb-backdrop" id="sbBackdrop" onclick="closeSidebar()"></div>
+
+<!-- ═══════════════════════════════════
+     SIDEBAR
+════════════════════════════════════ -->
 <aside class="sidebar" id="appSidebar">
 
-    <!-- Logo -->
-    <div class="sidebar-logo">
-        <div class="sidebar-logo-icon">💹</div>
-        <span class="sidebar-logo-text">Finance<em>AI</em></span>
-    </div>
+    <!-- Close btn (mobile only) -->
+    <button class="sb-close-btn" onclick="closeSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+        </svg>
+    </button>
 
-    <!-- User badge -->
-    <div class="sidebar-user">
-        <div class="user-avatar" id="sidebarAvatar">U</div>
-        <div class="user-info">
-            <div class="user-name" id="sidebarUserName">Loading...</div>
-            <div class="user-tag">Pro Account</div>
+    <!-- Profile section -->
+    <a href="/profile" class="sb-profile" style="text-decoration:none;" onclick="closeSidebarOnNav()">
+        <div class="sb-avatar-wrap">
+            <div class="sb-avatar" id="sidebarAvatar">M</div>
+            <div class="sb-avatar-ring"></div>
+            <div class="sb-online-dot"></div>
         </div>
-        <div class="user-status-dot"></div>
-    </div>
+        <div class="sb-profile-info">
+            <div class="sb-profile-name" id="sidebarUserName">Loading...</div>
+            <div class="sb-profile-email" id="sidebarUserEmail">user@financeai.com</div>
+        </div>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(100,116,139,.5)" stroke-width="2"
+            stroke-linecap="round">
+            <polyline points="9 18 15 12 9 6" />
+        </svg>
+    </a>
 
     <!-- Divider -->
-    <div class="sidebar-divider"></div>
+    <div class="sb-sep"></div>
 
-    <!-- Navigation -->
-    <nav class="sidebar-nav">
-        <p class="nav-section-label">MAIN MENU</p>
-        <ul class="nav-links">
-            <li>
-                <a href="/dashboard" class="nav-item" data-page="dashboard">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="3" y="3" width="7" height="7" />
-                            <rect x="14" y="3" width="7" height="7" />
-                            <rect x="14" y="14" width="7" height="7" />
-                            <rect x="3" y="14" width="7" height="7" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">Dashboard</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-            <li>
-                <a href="/analytics" class="nav-item" data-page="analytics">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">Analytics</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-            <li>
-                <a href="/transactions" class="nav-item" data-page="transactions">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <line x1="12" y1="1" x2="12" y2="23" />
-                            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">Transactions</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-            <li>
-                <a href="/budgets" class="nav-item" data-page="budgets">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <path
-                                d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">Budgets</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-        </ul>
+    <!-- Nav -->
+    <nav class="sb-nav">
 
-        <p class="nav-section-label" style="margin-top:20px;">INTELLIGENCE</p>
-        <ul class="nav-links">
-            <li>
-                <a href="/ai" class="nav-item" data-page="ai">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <circle cx="12" cy="12" r="10" />
-                            <path d="M12 8v4l3 3" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">AI Insights</span>
-                    <span class="nav-badge">AI</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-            <li>
-                <a href="/wealth" class="nav-item" data-page="wealth">
-                    <span class="nav-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                            stroke-linecap="round" stroke-linejoin="round">
-                            <polygon
-                                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
-                        </svg>
-                    </span>
-                    <span class="nav-label">Wealth Planner</span>
-                    <span class="nav-pip"></span>
-                </a>
-            </li>
-        </ul>
+        <div class="sb-nav-group">
+            <span class="sb-group-label">MAIN MENU</span>
+
+            <a href="/dashboard" class="sb-item" data-page="dashboard" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="3" y="3" width="7" height="7" />
+                        <rect x="14" y="3" width="7" height="7" />
+                        <rect x="14" y="14" width="7" height="7" />
+                        <rect x="3" y="14" width="7" height="7" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Dashboard</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/analytics" class="sb-item" data-page="analytics" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Analytics</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/transactions" class="sb-item" data-page="transactions" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <line x1="12" y1="1" x2="12" y2="23" />
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Transactions</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/budgets" class="sb-item" data-page="budgets" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path
+                            d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Budgets</span>
+                <span class="sb-item-pip"></span>
+            </a>
+        </div>
+
+        <div class="sb-nav-group">
+            <span class="sb-group-label">INTELLIGENCE</span>
+
+            <a href="/ai" class="sb-item" data-page="ai" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M12 2a10 10 0 0 1 10 10c0 5.52-4.48 10-10 10S2 17.52 2 12 6.48 2 12 2" />
+                        <path d="M12 6v6l4 2" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">AI Insights</span>
+                <span class="sb-ai-chip">AI</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/wealth" class="sb-item" data-page="wealth" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polygon
+                            points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Wealth Planner</span>
+                <span class="sb-item-pip"></span>
+            </a>
+        </div>
+
+        <div class="sb-nav-group">
+            <span class="sb-group-label">ACCOUNT</span>
+
+            <a href="/settings" class="sb-item" data-page="settings" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="3" />
+                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M4.93 4.93a10 10 0 0 0 0 14.14" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Settings</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/invite" class="sb-item" data-page="invite" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2" />
+                        <circle cx="9" cy="7" r="4" />
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87" />
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Invite Friends</span>
+                <span class="sb-invite-badge">+₹500</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/gift" class="sb-item" data-page="gift" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <polyline points="20 12 20 22 4 22 4 12" />
+                        <rect x="2" y="7" width="20" height="5" />
+                        <line x1="12" y1="22" x2="12" y2="7" />
+                        <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+                        <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Send a Gift</span>
+                <span class="sb-item-pip"></span>
+            </a>
+
+            <a href="/wallet" class="sb-item" data-page="wallet" onclick="closeSidebarOnNav()">
+                <span class="sb-item-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <rect x="2" y="5" width="20" height="14" rx="2" />
+                        <line x1="2" y1="10" x2="22" y2="10" />
+                    </svg>
+                </span>
+                <span class="sb-item-label">Get Wallet</span>
+                <span class="sb-new-badge">NEW</span>
+                <span class="sb-item-pip"></span>
+            </a>
+        </div>
     </nav>
 
-    <!-- Spacer -->
-    <div style="flex:1"></div>
+    <div style="flex:1;min-height:12px;"></div>
 
-    <!-- Divider -->
-    <div class="sidebar-divider"></div>
-
-    <!-- Logout -->
-    <button class="sidebar-logout" onclick="logout()">
-        <span class="logout-icon">
+    <!-- Sign out -->
+    <button class="sb-signout" onclick="logout()">
+        <span class="sb-signout-icon">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                 stroke-linejoin="round">
                 <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
@@ -126,7 +213,96 @@
                 <line x1="21" y1="12" x2="9" y2="12" />
             </svg>
         </span>
-        <span>Logout</span>
+        Sign out
     </button>
 
 </aside>
+
+<!-- ═══════════════════════════════════
+     MOBILE BOTTOM NAV
+════════════════════════════════════ -->
+<nav class="mob-bottom-nav">
+    <a href="/dashboard" class="mob-nav-item" data-page="dashboard">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <rect x="3" y="3" width="7" height="7" />
+            <rect x="14" y="3" width="7" height="7" />
+            <rect x="14" y="14" width="7" height="7" />
+            <rect x="3" y="14" width="7" height="7" />
+        </svg>
+        <span>Home</span>
+    </a>
+    <a href="/analytics" class="mob-nav-item" data-page="analytics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        <span>Analytics</span>
+    </a>
+    <a href="/transactions" class="mob-nav-item" data-page="transactions">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <line x1="12" y1="1" x2="12" y2="23" />
+            <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+        </svg>
+        <span>Txns</span>
+    </a>
+    <a href="/ai" class="mob-nav-item" data-page="ai">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10" />
+            <path d="M12 8v4l3 3" />
+        </svg>
+        <span>AI</span>
+    </a>
+    <a href="#" class="mob-nav-item" onclick="toggleSidebar()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round">
+            <circle cx="12" cy="8" r="4" />
+            <path d="M6 20v-2a6 6 0 0 1 12 0v2" />
+        </svg>
+        <span>More</span>
+    </a>
+</nav>
+
+<script>
+    function toggleSidebar() {
+        document.getElementById('appSidebar').classList.toggle('open');
+        document.getElementById('sbBackdrop').classList.toggle('active');
+        document.body.classList.toggle('sb-lock');
+    }
+    function closeSidebar() {
+        document.getElementById('appSidebar').classList.remove('open');
+        document.getElementById('sbBackdrop').classList.remove('active');
+        document.body.classList.remove('sb-lock');
+    }
+    function closeSidebarOnNav() {
+        if (window.innerWidth <= 820) closeSidebar();
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        // Mark active nav item
+        const page = window.location.pathname.split('/')[1] || 'dashboard';
+        document.querySelectorAll('.mob-nav-item[data-page], .sb-item[data-page]').forEach(a => {
+            if (a.dataset.page === page) a.classList.add('active');
+        });
+
+        // Load user info from token
+        const token = localStorage.getItem('token');
+        if (!token) return;
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            const email = p.sub || '';
+            const raw = email.split('@')[0];
+            const name = raw.split(/[._]/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+            const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+            const emailEl = document.getElementById('sidebarUserEmail');
+            const nameEl = document.getElementById('sidebarUserName');
+            const avatarEl = document.getElementById('sidebarAvatar');
+            if (emailEl) emailEl.textContent = email;
+            if (nameEl) nameEl.textContent = name;
+            if (avatarEl) avatarEl.textContent = initials;
+        } catch (e) { }
+    });
+</script>

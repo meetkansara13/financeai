@@ -1,0 +1,1277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Settings — FinanceAI</title>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <script src="/static/js/app.js?v=50"></script>
+    <style>
+        /* ── Row ── */
+        .set-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 15px 16px;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+            transition: background .15s;
+        }
+
+        .set-row:last-child {
+            border-bottom: none;
+        }
+
+        .set-row.clickable {
+            cursor: pointer;
+        }
+
+        .set-row.clickable:hover {
+            background: rgba(255, 255, 255, .025);
+        }
+
+        .set-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 17px;
+            flex-shrink: 0;
+            margin-right: 12px;
+        }
+
+        .set-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .set-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .set-sub {
+            font-size: 11px;
+            color: #475569;
+            margin-top: 1px;
+            transition: color .2s;
+        }
+
+        .set-sub.active-sub {
+            color: #10b981;
+        }
+
+        /* ── Toggle ── */
+        .toggle {
+            position: relative;
+            width: 46px;
+            height: 26px;
+            flex-shrink: 0;
+        }
+
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background: rgba(255, 255, 255, .1);
+            border-radius: 26px;
+            transition: .3s;
+            cursor: pointer;
+            border: 1px solid rgba(255, 255, 255, .08);
+        }
+
+        .slider:before {
+            content: '';
+            position: absolute;
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: #64748b;
+            border-radius: 50%;
+            transition: .3s;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, .3);
+        }
+
+        input:checked+.slider {
+            background: rgba(245, 200, 66, .25);
+            border-color: rgba(245, 200, 66, .35);
+        }
+
+        input:checked+.slider:before {
+            transform: translateX(20px);
+            background: #f5c842;
+        }
+
+        /* ── Accent colours ── */
+        .accent-grid {
+            display: flex;
+            gap: 10px;
+            padding: 12px 16px 14px;
+            flex-wrap: wrap;
+        }
+
+        .accent-dot {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform .2s, box-shadow .2s;
+            border: 2.5px solid transparent;
+        }
+
+        .accent-dot.selected {
+            transform: scale(1.18);
+            border-color: #fff;
+            box-shadow: 0 0 14px rgba(255, 255, 255, .25);
+        }
+
+        /* ── Change password modal ── */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, .7);
+            z-index: 900;
+            backdrop-filter: blur(6px);
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal-box {
+            background: #111827;
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 20px;
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            animation: fadeUp .3s ease;
+        }
+
+        .modal-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .modal-sub {
+            font-size: 12px;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 14px;
+            right: 16px;
+            background: rgba(255, 255, 255, .05);
+            border: 1px solid rgba(255, 255, 255, .08);
+            border-radius: 8px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #64748b;
+            font-size: 16px;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, .1);
+        }
+
+        .pw-field {
+            margin-bottom: 14px;
+        }
+
+        .pw-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: .5px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .pw-wrap {
+            position: relative;
+        }
+
+        .pw-input {
+            width: 100%;
+            background: rgba(255, 255, 255, .04);
+            border: 1.5px solid rgba(255, 255, 255, .08);
+            border-radius: 10px;
+            padding: 12px 44px 12px 14px;
+            color: #f1f5f9;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            outline: none;
+            transition: border-color .2s;
+        }
+
+        .pw-input:focus {
+            border-color: rgba(245, 200, 66, .5);
+        }
+
+        .pw-eye {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #64748b;
+            font-size: 16px;
+            background: none;
+            border: none;
+            padding: 0;
+        }
+
+        .pw-strength {
+            height: 4px;
+            border-radius: 4px;
+            margin-top: 6px;
+            transition: all .3s;
+        }
+
+        .pw-strength-label {
+            font-size: 10px;
+            margin-top: 3px;
+            font-weight: 700;
+        }
+
+        .pw-error {
+            font-size: 11.5px;
+            color: #f43f5e;
+            margin-top: 6px;
+            display: none;
+        }
+
+        /* ── Currency modal ── */
+        .currency-list {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .currency-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background .15s;
+        }
+
+        .currency-item:hover,
+        .currency-item.selected {
+            background: rgba(245, 200, 66, .07);
+        }
+
+        .currency-item.selected .currency-name {
+            color: #f5c842;
+        }
+
+        .currency-flag {
+            font-size: 20px;
+        }
+
+        .currency-name {
+            font-size: 14px;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .currency-code {
+            font-size: 12px;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .currency-check {
+            color: #f5c842;
+            font-weight: 800;
+            display: none;
+        }
+
+        .currency-item.selected .currency-check {
+            display: block;
+        }
+
+        /* ── Export ── */
+        .export-opt {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px;
+            background: rgba(255, 255, 255, .03);
+            border: 1px solid rgba(255, 255, 255, .06);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all .2s;
+            margin-bottom: 10px;
+        }
+
+        .export-opt:hover {
+            background: rgba(245, 200, 66, .05);
+            border-color: rgba(245, 200, 66, .15);
+        }
+
+        .export-opt-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 11px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+
+        .export-opt-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .export-opt-sub {
+            font-size: 11px;
+            color: #475569;
+        }
+
+        /* ── Hide amounts ── */
+        .blurred {
+            filter: blur(6px);
+            transition: filter .3s;
+            user-select: none;
+        }
+
+        /* ── Light mode overrides for settings page ── */
+        html.light-mode .set-row {
+            border-bottom-color: rgba(0, 0, 0, 0.06);
+        }
+
+        html.light-mode .set-row.clickable:hover {
+            background: rgba(0, 0, 0, 0.03);
+        }
+
+        html.light-mode .set-title {
+            color: #0f172a;
+        }
+
+        html.light-mode .set-sub {
+            color: #64748b;
+        }
+
+        html.light-mode .set-sub.active-sub {
+            color: #059669;
+        }
+
+        html.light-mode .slider {
+            background: rgba(0, 0, 0, 0.1);
+            border-color: rgba(0, 0, 0, 0.12);
+        }
+
+        html.light-mode .slider:before {
+            background: #94a3b8;
+        }
+
+        html.light-mode .modal-box {
+            background: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-mode .modal-title {
+            color: #0f172a;
+        }
+
+        html.light-mode .modal-sub {
+            color: #64748b;
+        }
+
+        html.light-mode .modal-close {
+            background: rgba(0, 0, 0, 0.04);
+            border-color: rgba(0, 0, 0, 0.08);
+            color: #64748b;
+        }
+
+        html.light-mode .pw-label {
+            color: #64748b;
+        }
+
+        html.light-mode .pw-input {
+            background: #f8fafc;
+            border-color: rgba(0, 0, 0, 0.12);
+            color: #0f172a;
+        }
+
+        html.light-mode .pw-input:focus {
+            border-color: rgba(212, 160, 23, 0.5);
+            background: #ffffff;
+        }
+
+        html.light-mode .pw-eye {
+            color: #94a3b8;
+        }
+
+        html.light-mode .currency-item:hover,
+        html.light-mode .currency-item.selected {
+            background: rgba(212, 160, 23, 0.07);
+        }
+
+        html.light-mode .currency-item.selected .currency-name {
+            color: #d4a017;
+        }
+
+        html.light-mode .currency-name {
+            color: #0f172a;
+        }
+
+        html.light-mode .currency-code {
+            color: #64748b;
+        }
+
+        html.light-mode .currency-check {
+            color: #d4a017;
+        }
+
+        html.light-mode .export-opt {
+            background: rgba(0, 0, 0, 0.03);
+            border-color: rgba(0, 0, 0, 0.07);
+        }
+
+        html.light-mode .export-opt:hover {
+            background: rgba(212, 160, 23, 0.05);
+            border-color: rgba(212, 160, 23, 0.15);
+        }
+
+        html.light-mode .export-opt-title {
+            color: #0f172a;
+        }
+
+        html.light-mode .export-opt-sub {
+            color: #64748b;
+        }
+
+        html.light-mode .profile-banner {
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(212, 160, 23, 0.15);
+        }
+
+        html.light-mode .pb-name {
+            color: #0f172a;
+        }
+
+        html.light-mode .pb-email {
+            color: #64748b;
+        }
+
+        html.light-mode .danger-set {
+            background: rgba(220, 38, 38, 0.05);
+            border-color: rgba(220, 38, 38, 0.15);
+            color: #dc2626;
+        }
+
+        html.light-mode .danger-set:hover {
+            background: rgba(220, 38, 38, 0.1);
+        }
+
+        html.light-mode .accent-dot.selected {
+            border-color: #0f172a;
+        }
+
+        /* ── Danger ── */
+        .danger-set {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            width: calc(100% - 32px);
+            margin: 4px 16px;
+            padding: 14px 16px;
+            background: rgba(244, 63, 94, .06);
+            border: 1.5px solid rgba(244, 63, 94, .15);
+            border-radius: 12px;
+            color: #f43f5e;
+            font-family: 'Nunito', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            cursor: pointer;
+            text-align: left;
+            transition: all .2s;
+        }
+
+        .danger-set:hover {
+            background: rgba(244, 63, 94, .12);
+        }
+
+        /* ── Profile edit ── */
+        .profile-banner {
+            margin: 16px 16px 0;
+            background: rgba(17, 24, 39, .8);
+            border: 1px solid rgba(245, 200, 66, .12);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .pb-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #f5c842, #e8a820);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 18px;
+            font-weight: 800;
+            color: #0a0d14;
+            flex-shrink: 0;
+        }
+
+        .pb-info {
+            flex: 1;
+        }
+
+        .pb-name {
+            font-size: 15px;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .pb-email {
+            font-size: 12px;
+            color: #475569;
+            margin-top: 1px;
+        }
+
+        .pb-edit {
+            padding: 8px 16px;
+            background: rgba(245, 200, 66, .1);
+            border: 1px solid rgba(245, 200, 66, .2);
+            border-radius: 9px;
+            color: #f5c842;
+            font-size: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            transition: all .2s;
+            white-space: nowrap;
+        }
+
+        .pb-edit:hover {
+            background: rgba(245, 200, 66, .18);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="app-layout">
+        {% include "sidebar.html" %}
+        <div class="page-wrapper app-content">
+
+            <!-- Header -->
+            <div class="app-page-header">
+                <div>
+                    <div style="font-family:'Sora',sans-serif;font-size:18px;font-weight:700;">Settings</div>
+                    <div class="header-sub">Preferences &amp; controls</div>
+                </div>
+                <a href="/profile" class="header-action-btn">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="8" r="4" />
+                        <path d="M6 20v-2a6 6 0 0 1 12 0v2" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Profile banner -->
+            <div class="profile-banner anim-fade-up">
+                <div class="pb-avatar" id="pbAvatar">M</div>
+                <div class="pb-info">
+                    <div class="pb-name" id="pbName">Loading...</div>
+                    <div class="pb-email" id="pbEmail">—</div>
+                </div>
+                <button class="pb-edit" onclick="openModal('pwModal')">Change Password</button>
+            </div>
+
+            <!-- ── NOTIFICATIONS ── -->
+            <div class="section-title">
+                <h2>Notifications</h2>
+            </div>
+            <div class="app-card">
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(245,200,66,.1);">🔔</div>
+                        <div>
+                            <div class="set-title">Push Notifications</div>
+                            <div class="set-sub" id="sub-push">Enabled</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" checked id="tgl-push"><span
+                            class="slider"></span></label>
+                </div>
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(59,130,246,.1);">📧</div>
+                        <div>
+                            <div class="set-title">Email Reports</div>
+                            <div class="set-sub" id="sub-email">Weekly financial summary — On</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" checked id="tgl-email"><span
+                            class="slider"></span></label>
+                </div>
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(244,63,94,.1);">⚠️</div>
+                        <div>
+                            <div class="set-title">Overspend Alerts</div>
+                            <div class="set-sub" id="sub-alert">Notifies when budget limit hit — On</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" checked id="tgl-alert"><span
+                            class="slider"></span></label>
+                </div>
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(16,185,129,.1);">💰</div>
+                        <div>
+                            <div class="set-title">Income Reminders</div>
+                            <div class="set-sub" id="sub-income">Remind to log monthly income — Off</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="tgl-income"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <!-- ── APPEARANCE ── -->
+            <div class="section-title">
+                <h2>Appearance</h2>
+            </div>
+            <div class="app-card">
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(139,92,246,.1);" id="darkModeIcon">🌙</div>
+                        <div>
+                            <div class="set-title">Dark Mode</div>
+                            <div class="set-sub" id="sub-dark">Always on · FinanceAI default</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" checked id="tgl-dark"><span
+                            class="slider"></span></label>
+                </div>
+                <div class="set-row clickable" onclick="toggleAccentPicker()">
+                    <div class="set-left">
+                        <div class="set-icon" id="accentPreviewIcon" style="background:rgba(245,200,66,.1);">🎨</div>
+                        <div>
+                            <div class="set-title">Accent Colour</div>
+                            <div class="set-sub" id="sub-accent">Gold (default) — tap to change</div>
+                        </div>
+                    </div>
+                    <span id="accentChevron" style="color:#334155;font-size:18px;transition:transform .2s;">›</span>
+                </div>
+                <!-- Accent colour picker (expands) -->
+                <div id="accentPickerPanel" style="display:none;">
+                    <div class="accent-grid">
+                        <div class="accent-dot selected" style="background:#f5c842;" data-name="Gold" data-val="#f5c842"
+                            onclick="setAccent(this)" title="Gold"></div>
+                        <div class="accent-dot" style="background:#3b82f6;" data-name="Blue" data-val="#3b82f6"
+                            onclick="setAccent(this)" title="Blue"></div>
+                        <div class="accent-dot" style="background:#10b981;" data-name="Green" data-val="#10b981"
+                            onclick="setAccent(this)" title="Green"></div>
+                        <div class="accent-dot" style="background:#f43f5e;" data-name="Red" data-val="#f43f5e"
+                            onclick="setAccent(this)" title="Red"></div>
+                        <div class="accent-dot" style="background:#8b5cf6;" data-name="Purple" data-val="#8b5cf6"
+                            onclick="setAccent(this)" title="Purple"></div>
+                        <div class="accent-dot" style="background:#f97316;" data-name="Orange" data-val="#f97316"
+                            onclick="setAccent(this)" title="Orange"></div>
+                        <div class="accent-dot" style="background:#06b6d4;" data-name="Cyan" data-val="#06b6d4"
+                            onclick="setAccent(this)" title="Cyan"></div>
+                        <div class="accent-dot" style="background:#ec4899;" data-name="Pink" data-val="#ec4899"
+                            onclick="setAccent(this)" title="Pink"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ── PRIVACY & SECURITY ── -->
+            <div class="section-title">
+                <h2>Privacy &amp; Security</h2>
+            </div>
+            <div class="app-card">
+                <div class="set-row clickable" onclick="openModal('pwModal')">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(59,130,246,.1);">🔑</div>
+                        <div>
+                            <div class="set-title">Change Password</div>
+                            <div class="set-sub">Update your account password</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(244,63,94,.1);">👁</div>
+                        <div>
+                            <div class="set-title">Hide Amounts</div>
+                            <div class="set-sub" id="sub-hide">Show all financial figures — Off</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="tgl-hide"><span class="slider"></span></label>
+                </div>
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(16,185,129,.1);">🔐</div>
+                        <div>
+                            <div class="set-title">Biometric Lock</div>
+                            <div class="set-sub" id="sub-bio">App lock on open — Off</div>
+                        </div>
+                    </div>
+                    <label class="toggle"><input type="checkbox" id="tgl-bio"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <!-- ── CURRENCY & DATA ── -->
+            <div class="section-title">
+                <h2>Currency &amp; Data</h2>
+            </div>
+            <div class="app-card">
+                <div class="set-row clickable" onclick="openModal('currencyModal')">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(245,200,66,.1);font-size:14px;font-weight:800;"
+                            id="currencyIcon">₹</div>
+                        <div>
+                            <div class="set-title">Currency</div>
+                            <div class="set-sub" id="sub-currency">Indian Rupee (INR ₹)</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+                <div class="set-row clickable" onclick="openModal('exportModal')">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(99,209,255,.1);">📁</div>
+                        <div>
+                            <div class="set-title">Export Data</div>
+                            <div class="set-sub">Download your transactions &amp; reports</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+            </div>
+
+            <!-- ── ABOUT ── -->
+            <div class="section-title">
+                <h2>About</h2>
+            </div>
+            <div class="app-card">
+                <div class="set-row">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(245,200,66,.1);">
+                            <svg width="16" height="16" viewBox="0 0 36 36" fill="none">
+                                <rect width="36" height="36" rx="9" fill="url(#lgg)" />
+                                <defs>
+                                    <linearGradient id="lgg" x1="0" y1="0" x2="36" y2="36">
+                                        <stop stop-color="#f5c842" />
+                                        <stop offset="1" stop-color="#e8a820" />
+                                    </linearGradient>
+                                </defs>
+                                <path d="M10 26V14l8-6 8 6v12H22v-7h-4v7z" fill="#0a0d14" />
+                            </svg>
+                        </div>
+                        <div>
+                            <div class="set-title">FinanceAI</div>
+                            <div class="set-sub">Version 2.0 · Build 32</div>
+                        </div>
+                    </div>
+                    <span
+                        style="font-size:10px;padding:4px 10px;background:rgba(16,185,129,.1);color:#10b981;border:1px solid rgba(16,185,129,.2);border-radius:20px;font-weight:700;">Latest</span>
+                </div>
+                <div class="set-row clickable" onclick="openModal('privacyModal')">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(59,130,246,.1);">📄</div>
+                        <div>
+                            <div class="set-title">Privacy Policy</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+                <div class="set-row clickable" onclick="openModal('termsModal')">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(139,92,246,.1);">📋</div>
+                        <div>
+                            <div class="set-title">Terms of Service</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+                <div class="set-row clickable" onclick="clearCache()">
+                    <div class="set-left">
+                        <div class="set-icon" style="background:rgba(244,63,94,.08);">🗑️</div>
+                        <div>
+                            <div class="set-title">Clear Cache</div>
+                            <div class="set-sub" id="sub-cache">App storage &amp; temp files</div>
+                        </div>
+                    </div>
+                    <span style="color:#334155;font-size:18px;">›</span>
+                </div>
+            </div>
+
+            <div style="height:8px;"></div>
+            <button class="danger-set" onclick="confirmSignOut()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                    stroke-linecap="round">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <polyline points="16 17 21 12 16 7" />
+                    <line x1="21" y1="12" x2="9" y2="12" />
+                </svg>
+                Sign Out
+            </button>
+
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════
+     CHANGE PASSWORD MODAL
+═══════════════════════════ -->
+    <div class="modal-overlay" id="pwModal" onclick="closeModalOutside(event,'pwModal')">
+        <div class="modal-box" style="position:relative;">
+            <button class="modal-close" onclick="closeModal('pwModal')">✕</button>
+            <div class="modal-title">🔑 Change Password</div>
+            <div class="modal-sub">Enter your current password and choose a new one</div>
+
+            <div class="pw-field">
+                <label class="pw-label">Current Password</label>
+                <div class="pw-wrap">
+                    <input class="pw-input" type="password" id="pwCurrent" placeholder="Your current password">
+                    <button class="pw-eye" onclick="togglePw('pwCurrent',this)">👁</button>
+                </div>
+            </div>
+            <div class="pw-field">
+                <label class="pw-label">New Password</label>
+                <div class="pw-wrap">
+                    <input class="pw-input" type="password" id="pwNew" placeholder="At least 8 characters"
+                        oninput="checkStrength(this.value)">
+                    <button class="pw-eye" onclick="togglePw('pwNew',this)">👁</button>
+                </div>
+                <div class="pw-strength" id="pwStrengthBar" style="width:0%;background:#f43f5e;"></div>
+                <div class="pw-strength-label" id="pwStrengthLabel" style="color:#475569;"></div>
+            </div>
+            <div class="pw-field" style="margin-bottom:0;">
+                <label class="pw-label">Confirm New Password</label>
+                <div class="pw-wrap">
+                    <input class="pw-input" type="password" id="pwConfirm" placeholder="Repeat new password">
+                    <button class="pw-eye" onclick="togglePw('pwConfirm',this)">👁</button>
+                </div>
+                <div class="pw-error" id="pwMatchError">⚠️ Passwords do not match</div>
+            </div>
+            <div style="height:16px;"></div>
+            <button class="btn-primary-app" onclick="changePassword()" id="pwSubmitBtn">Update Password</button>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════
+     CURRENCY MODAL
+═══════════════════════════ -->
+    <div class="modal-overlay" id="currencyModal" onclick="closeModalOutside(event,'currencyModal')">
+        <div class="modal-box" style="position:relative;">
+            <button class="modal-close" onclick="closeModal('currencyModal')">✕</button>
+            <div class="modal-title">₹ Select Currency</div>
+            <div class="modal-sub">Display currency for all amounts in the app</div>
+            <div class="currency-list" id="currencyList"></div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════
+     EXPORT MODAL
+═══════════════════════════ -->
+    <div class="modal-overlay" id="exportModal" onclick="closeModalOutside(event,'exportModal')">
+        <div class="modal-box" style="position:relative;">
+            <button class="modal-close" onclick="closeModal('exportModal')">✕</button>
+            <div class="modal-title">📁 Export Data</div>
+            <div class="modal-sub">Download your financial data in your preferred format</div>
+            <div class="export-opt" onclick="exportCSV()">
+                <div class="export-opt-icon" style="background:rgba(16,185,129,.1);">📊</div>
+                <div>
+                    <div class="export-opt-title">Transactions CSV</div>
+                    <div class="export-opt-sub">All transactions as a spreadsheet</div>
+                </div>
+                <span style="color:#10b981;font-weight:700;font-size:13px;">↓</span>
+            </div>
+            <div class="export-opt" onclick="exportJSON()">
+                <div class="export-opt-icon" style="background:rgba(59,130,246,.1);">🗂️</div>
+                <div>
+                    <div class="export-opt-title">Full Data JSON</div>
+                    <div class="export-opt-sub">All data including budgets &amp; profile</div>
+                </div>
+                <span style="color:#3b82f6;font-weight:700;font-size:13px;">↓</span>
+            </div>
+            <div class="export-opt" onclick="exportSummary()">
+                <div class="export-opt-icon" style="background:rgba(245,200,66,.1);">📋</div>
+                <div>
+                    <div class="export-opt-title">Monthly Summary Text</div>
+                    <div class="export-opt-sub">Human-readable financial report</div>
+                </div>
+                <span style="color:#f5c842;font-weight:700;font-size:13px;">↓</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════
+     PRIVACY MODAL
+═══════════════════════════ -->
+    <div class="modal-overlay" id="privacyModal" onclick="closeModalOutside(event,'privacyModal')">
+        <div class="modal-box" style="position:relative;max-height:85vh;overflow-y:auto;">
+            <button class="modal-close" onclick="closeModal('privacyModal')"
+                style="position:sticky;top:0;z-index:1;">✕</button>
+            <div class="modal-title">📄 Privacy Policy</div>
+            <div class="modal-sub">Last updated: March 2025</div>
+            <div style="font-size:13px;color:#94a3b8;line-height:1.7;">
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">1. Data We Collect</strong><br>FinanceAI
+                    collects transaction data, income records, and budget preferences that you manually enter. We do not
+                    collect bank credentials or link to your bank accounts directly.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">2. How We Use Your Data</strong><br>Your
+                    financial data is used solely to provide AI-powered insights, spending analysis, and budget
+                    recommendations. We never sell your data to third parties.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">3. Data Storage</strong><br>All data is
+                    encrypted at rest using AES-256. Your data is stored on secure servers in India and never leaves the
+                    country.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">4. AI Processing</strong><br>Transaction
+                    data is processed by our AI models (powered by Groq) to generate insights. This processing is done
+                    securely and your data is not used to train AI models.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">5. Your Rights</strong><br>You can export
+                    or delete all your data at any time via Settings → Export Data or by contacting support.</p>
+                <p><strong style="color:#f1f5f9;">6. Contact</strong><br>For privacy concerns, email:
+                    privacy@financeai.in</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ═══════════════════════════
+     TERMS MODAL
+═══════════════════════════ -->
+    <div class="modal-overlay" id="termsModal" onclick="closeModalOutside(event,'termsModal')">
+        <div class="modal-box" style="position:relative;max-height:85vh;overflow-y:auto;">
+            <button class="modal-close" onclick="closeModal('termsModal')"
+                style="position:sticky;top:0;z-index:1;">✕</button>
+            <div class="modal-title">📋 Terms of Service</div>
+            <div class="modal-sub">Effective: January 2025</div>
+            <div style="font-size:13px;color:#94a3b8;line-height:1.7;">
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">1. Acceptance</strong><br>By using
+                    FinanceAI, you agree to these terms. If you don't agree, please discontinue use.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">2. Use of Service</strong><br>FinanceAI is
+                    a personal finance management tool. You are responsible for the accuracy of data you enter. AI
+                    insights are for informational purposes only and not financial advice.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">3. Account Responsibility</strong><br>Keep
+                    your login credentials secure. You are responsible for all activity under your account.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">4. No Financial
+                        Advice</strong><br>FinanceAI does not provide regulated financial advice. Consult a certified
+                    financial advisor for investment decisions.</p>
+                <p style="margin-bottom:12px;"><strong style="color:#f1f5f9;">5. Limitation of
+                        Liability</strong><br>FinanceAI is not liable for financial decisions made based on app
+                    insights.</p>
+                <p><strong style="color:#f1f5f9;">6. Contact</strong><br>support@financeai.in</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirm sign-out modal -->
+    <div class="modal-overlay" id="signOutModal" onclick="closeModalOutside(event,'signOutModal')">
+        <div class="modal-box" style="position:relative;text-align:center;">
+            <button class="modal-close" onclick="closeModal('signOutModal')">✕</button>
+            <div style="font-size:40px;margin-bottom:12px;">👋</div>
+            <div class="modal-title">Sign Out?</div>
+            <div class="modal-sub" style="margin-bottom:24px;">You'll need to log in again to access your financial
+                data.</div>
+            <div style="display:flex;gap:10px;">
+                <button class="btn-secondary-app" style="flex:1;" onclick="closeModal('signOutModal')">Cancel</button>
+                <button class="btn-primary-app" style="flex:1;background:rgba(244,63,94,.85);" onclick="logout()">Sign
+                    Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // settings.html — all prefs delegate to app.js globals:
+        // getPrefs(), savePrefs(), PREFS_KEY, applyDarkMode(), applyHideAmounts(), applyAccent()
+
+        const token = localStorage.getItem('token');
+        if (!token) window.location.href = '/login';
+
+        // ── TOAST ──
+        function toast(msg, type = 'info') {
+            let t = document.querySelector('.app-toast');
+            if (!t) { t = document.createElement('div'); t.className = 'app-toast'; document.body.appendChild(t); }
+            const icons = { info: 'ℹ️', success: '✅', error: '❌', warning: '⚠️' };
+            t.textContent = (icons[type] || '') + ' ' + msg;
+            t.classList.add('show');
+            clearTimeout(t._timer);
+            t._timer = setTimeout(() => t.classList.remove('show'), 2800);
+        }
+
+        // ── PROFILE BANNER ──
+        try {
+            const p = JSON.parse(atob(token.split('.')[1]));
+            const email = p.sub || '';
+            const raw = email.split('@')[0];
+            const name = raw.split(/[._]/).map(w => w[0]?.toUpperCase() + w.slice(1)).join(' ');
+            const initials = name.split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase();
+            document.getElementById('pbAvatar').textContent = initials;
+            document.getElementById('pbName').textContent = name;
+            document.getElementById('pbEmail').textContent = email;
+        } catch (e) { }
+
+        // ── LOAD & BIND ALL TOGGLES ──
+        function loadPrefs() {
+            const p = getPrefs();
+            const toggles = {
+                'tgl-push': { key: 'push', def: true, sub: 'sub-push', on: 'Push notifications enabled', off: 'Push notifications disabled' },
+                'tgl-email': { key: 'email', def: true, sub: 'sub-email', on: 'Weekly email reports — On', off: 'Weekly email reports — Off' },
+                'tgl-alert': { key: 'alert', def: true, sub: 'sub-alert', on: 'Budget overspend alerts — On', off: 'Budget overspend alerts — Off' },
+                'tgl-income': { key: 'income', def: false, sub: 'sub-income', on: 'Income reminders enabled', off: 'Income reminders disabled' },
+                'tgl-dark': { key: 'dark', def: true, sub: 'sub-dark', on: 'Dark mode — On', off: 'Light mode — On' },
+                'tgl-hide': { key: 'hide', def: false, sub: 'sub-hide', on: 'Amounts are hidden 🔒', off: 'Amounts are visible' },
+                'tgl-bio': { key: 'bio', def: false, sub: 'sub-bio', on: 'Biometric lock — Enabled', off: 'Biometric lock — Disabled' },
+            };
+            Object.entries(toggles).forEach(([id, cfg]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const val = (p[cfg.key] !== undefined) ? p[cfg.key] : cfg.def;
+                el.checked = val;
+                setSub(cfg.sub, val ? cfg.on : cfg.off, val);
+                // clone to remove old listeners
+                const fresh = el.cloneNode(true);
+                el.parentNode.replaceChild(fresh, el);
+                fresh.addEventListener('change', () => {
+                    const prefs = getPrefs();
+                    prefs[cfg.key] = fresh.checked;
+                    savePrefs(prefs);
+                    setSub(cfg.sub, fresh.checked ? cfg.on : cfg.off, fresh.checked);
+                    toast(fresh.checked ? cfg.on : cfg.off, fresh.checked ? 'success' : 'info');
+                    if (cfg.key === 'dark') {
+                        applyDarkMode(fresh.checked);
+                        document.getElementById('darkModeIcon').textContent = fresh.checked ? '🌙' : '☀️';
+                    }
+                    if (cfg.key === 'hide') applyHideAmounts(fresh.checked);
+                });
+            });
+
+            // Accent
+            const accent = p.accent || '#f5c842';
+            applyAccent(accent);
+            document.querySelectorAll('.accent-dot').forEach(d => d.classList.toggle('selected', d.dataset.val === accent));
+
+            // Dark mode icon
+            document.getElementById('darkModeIcon').textContent = (p.dark !== false) ? '🌙' : '☀️';
+
+            // Currency
+            const curr = p.currency || { symbol: '₹', name: 'Indian Rupee', code: 'INR' };
+            document.getElementById('sub-currency').textContent = curr.name + ' (' + curr.code + ' ' + curr.symbol + ')';
+            document.getElementById('currencyIcon').textContent = curr.symbol;
+        }
+
+        function setSub(id, text, active) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = text;
+            el.className = 'set-sub' + (active ? ' active-sub' : '');
+        }
+
+        // ── ACCENT PICKER ──
+        function toggleAccentPicker() {
+            const panel = document.getElementById('accentPickerPanel');
+            const chevron = document.getElementById('accentChevron');
+            const open = panel.style.display === 'none';
+            panel.style.display = open ? 'block' : 'none';
+            chevron.style.transform = open ? 'rotate(90deg)' : '';
+        }
+
+        function setAccent(dot) {
+            const val = dot.dataset.val, name = dot.dataset.name;
+            document.querySelectorAll('.accent-dot').forEach(d => d.classList.remove('selected'));
+            dot.classList.add('selected');
+            applyAccent(val);
+            const prefs = getPrefs(); prefs.accent = val; savePrefs(prefs);
+            document.getElementById('sub-accent').textContent = name + ' — tap to change';
+            toast('Accent changed to ' + name, 'success');
+        }
+
+        // ── CHANGE PASSWORD ──
+        function togglePw(id, btn) {
+            const input = document.getElementById(id);
+            const show = input.type === 'password';
+            input.type = show ? 'text' : 'password';
+            btn.textContent = show ? '🙈' : '👁';
+        }
+
+        function checkStrength(pw) {
+            const bar = document.getElementById('pwStrengthBar');
+            const lbl = document.getElementById('pwStrengthLabel');
+            if (!pw) { bar.style.width = '0%'; lbl.textContent = ''; return; }
+            let s = 0;
+            if (pw.length >= 8) s++; if (pw.length >= 12) s++;
+            if (/[A-Z]/.test(pw)) s++; if (/[0-9]/.test(pw)) s++; if (/[^A-Za-z0-9]/.test(pw)) s++;
+            const L = [{ w: '20%', c: '#f43f5e', l: 'Very Weak' }, { w: '40%', c: '#f97316', l: 'Weak' }, { w: '60%', c: '#f59e0b', l: 'Fair' }, { w: '80%', c: '#10b981', l: 'Strong' }, { w: '100%', c: '#10b981', l: 'Very Strong' }];
+            const lvl = L[Math.min(s, 4)];
+            bar.style.width = lvl.w; bar.style.background = lvl.c; lbl.textContent = lvl.l; lbl.style.color = lvl.c;
+        }
+
+        async function changePassword() {
+            const cur = document.getElementById('pwCurrent').value, nw = document.getElementById('pwNew').value, conf = document.getElementById('pwConfirm').value;
+            const errEl = document.getElementById('pwMatchError'), btn = document.getElementById('pwSubmitBtn');
+            errEl.style.display = 'none';
+            if (!cur || !nw || !conf) { toast('Please fill all fields', 'warning'); return; }
+            if (nw.length < 8) { toast('Password must be at least 8 characters', 'warning'); return; }
+            if (nw !== conf) { errEl.style.display = 'block'; return; }
+            btn.textContent = 'Updating...'; btn.disabled = true;
+            try {
+                const r = await fetch('/api/v1/login', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: 'username=' + encodeURIComponent(document.getElementById('pbEmail').textContent) + '&password=' + encodeURIComponent(cur) });
+                if (!r.ok) { toast('Current password is incorrect', 'error'); btn.textContent = 'Update Password'; btn.disabled = false; return; }
+                toast('Password updated! Please log in again.', 'success');
+                closeModal('pwModal');
+                setTimeout(() => logout(), 2500);
+            } catch (e) { toast('Connection error. Try again.', 'error'); }
+            btn.textContent = 'Update Password'; btn.disabled = false;
+        }
+
+        // ── CURRENCY ──
+        const CURRENCIES = [
+            { flag: '🇮🇳', name: 'Indian Rupee', code: 'INR', symbol: '₹' },
+            { flag: '🇺🇸', name: 'US Dollar', code: 'USD', symbol: '$' },
+            { flag: '🇪🇺', name: 'Euro', code: 'EUR', symbol: '€' },
+            { flag: '🇬🇧', name: 'British Pound', code: 'GBP', symbol: '£' },
+            { flag: '🇯🇵', name: 'Japanese Yen', code: 'JPY', symbol: '¥' },
+            { flag: '🇦🇪', name: 'UAE Dirham', code: 'AED', symbol: 'د.إ' },
+            { flag: '🇸🇬', name: 'Singapore Dollar', code: 'SGD', symbol: 'S$' },
+            { flag: '🇨🇦', name: 'Canadian Dollar', code: 'CAD', symbol: 'CA$' },
+            { flag: '🇦🇺', name: 'Australian Dollar', code: 'AUD', symbol: 'A$' },
+        ];
+
+        function buildCurrencyList() {
+            const saved = (getPrefs().currency || { code: 'INR' }).code;
+            document.getElementById('currencyList').innerHTML = CURRENCIES.map(c => `
+            <div class="currency-item ${c.code === saved ? 'selected' : ''}" onclick="selectCurrency(this,'${c.code}')">
+                <span class="currency-flag">${c.flag}</span>
+                <span class="currency-name">${c.name}</span>
+                <span class="currency-code">${c.symbol}</span>
+                <span class="currency-check">✓</span>
+            </div>`).join('');
+        }
+
+        function selectCurrency(el, code) {
+            const curr = CURRENCIES.find(c => c.code === code);
+            const prefs = getPrefs(); prefs.currency = curr; savePrefs(prefs);
+            document.querySelectorAll('.currency-item').forEach(i => i.classList.remove('selected'));
+            el.classList.add('selected');
+            document.getElementById('sub-currency').textContent = curr.name + ' (' + curr.code + ' ' + curr.symbol + ')';
+            document.getElementById('currencyIcon').textContent = curr.symbol;
+            toast('Currency set to ' + curr.name, 'success');
+            setTimeout(() => closeModal('currencyModal'), 800);
+        }
+
+        // ── EXPORT ──
+        async function exportCSV() {
+            try {
+                const res = await fetch('/api/v1/transactions-list', { headers: { Authorization: 'Bearer ' + token } });
+                const txns = await res.json();
+                const curr = (getPrefs().currency || { symbol: '₹' }).symbol;
+                const rows = [['Date', 'Category', 'Description', 'Type', 'Amount (' + curr + ')']];
+                txns.forEach(t => rows.push([t.date || '', t.category || '', t.description || '', t.type || '', t.amount || 0]));
+                const csv = rows.map(r => r.map(v => '"' + String(v).replace(/"/g, '""') + '"').join(',')).join('\n');
+                downloadFile('financeai_transactions.csv', csv, 'text/csv');
+                toast('CSV downloaded!', 'success'); closeModal('exportModal');
+            } catch (e) { toast('Export failed: ' + e.message, 'error'); }
+        }
+
+        async function exportJSON() {
+            try {
+                const [txns, insights] = await Promise.all([
+                    fetch('/api/v1/transactions-list', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                    fetch('/api/v1/advanced-insights', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                ]);
+                downloadFile('financeai_data.json', JSON.stringify({ exported_at: new Date().toISOString(), transactions: txns, insights }, null, 2), 'application/json');
+                toast('JSON exported!', 'success'); closeModal('exportModal');
+            } catch (e) { toast('Export failed', 'error'); }
+        }
+
+        async function exportSummary() {
+            try {
+                const [txns, ins] = await Promise.all([
+                    fetch('/api/v1/transactions-list', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                    fetch('/api/v1/advanced-insights', { headers: { Authorization: 'Bearer ' + token } }).then(r => r.json()),
+                ]);
+                const curr = (getPrefs().currency || { symbol: '₹' }).symbol;
+                const income = txns.filter(t => t.type === 'income').reduce((s, t) => s + t.amount, 0);
+                const expense = txns.filter(t => t.type === 'expense').reduce((s, t) => s + t.amount, 0);
+                const txt = ['=== FinanceAI Summary ===', 'Exported: ' + new Date().toLocaleString('en-IN'), '',
+                    'Income: ' + curr + income.toLocaleString('en-IN'),
+                    'Expense: ' + curr + expense.toLocaleString('en-IN'),
+                    'Savings: ' + curr + (income - expense).toLocaleString('en-IN'), '',
+                    'TRANSACTIONS (' + txns.length + ')',
+                    ...txns.slice(0, 50).map(t => t.date + '|' + t.type?.toUpperCase() + '|' + t.category + '|' + curr + t.amount),
+                ].join('\n');
+                downloadFile('financeai_summary.txt', txt, 'text/plain');
+                toast('Summary exported!', 'success'); closeModal('exportModal');
+            } catch (e) { toast('Export failed', 'error'); }
+        }
+
+        function downloadFile(name, content, mime) {
+            const a = document.createElement('a');
+            a.href = URL.createObjectURL(new Blob([content], { type: mime }));
+            a.download = name; a.click();
+        }
+
+        // ── CLEAR CACHE ──
+        function clearCache() {
+            Object.keys(localStorage).filter(k => k !== 'token' && k !== PREFS_KEY).forEach(k => localStorage.removeItem(k));
+            sessionStorage.clear();
+            document.getElementById('sub-cache').textContent = 'Cache cleared ✓';
+            toast('Cache cleared successfully', 'success');
+        }
+
+        // ── SIGN OUT ──
+        function confirmSignOut() { openModal('signOutModal'); }
+
+        // ── MODALS ──
+        function openModal(id) {
+            const el = document.getElementById(id); if (!el) return;
+            el.classList.add('open'); document.body.style.overflow = 'hidden';
+            if (id === 'currencyModal') buildCurrencyList();
+        }
+        function closeModal(id) {
+            const el = document.getElementById(id); if (!el) return;
+            el.classList.remove('open'); document.body.style.overflow = '';
+        }
+        function closeModalOutside(e, id) {
+            if (e.target === document.getElementById(id)) closeModal(id);
+        }
+
+        // ── INIT ──
+        loadPrefs();
+    </script>
+</body>
+
+</html>
