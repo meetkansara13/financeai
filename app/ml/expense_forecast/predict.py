@@ -7,11 +7,22 @@ from app.ml.common.feature_engineering import build_expense_features
 BASE_DIR = os.path.dirname(__file__)
 MODEL_PATH = os.path.join(BASE_DIR, "model.pkl")
 
-model = joblib.load(MODEL_PATH)
+model = None
+
+def _load_model():
+    global model
+    if model is None:
+        if not os.path.exists(MODEL_PATH):
+            return None
+        model = joblib.load(MODEL_PATH)
+    return model
 
 
 def predict_month_end_expense(current_expense, income):
-    
+    m = _load_model()
+    if m is None:
+        # Model not available — return a simple linear estimate
+        return round(current_expense * 1.1, 2)
 
     today = datetime.now().day
     current_month = datetime.now().month
@@ -26,6 +37,5 @@ def predict_month_end_expense(current_expense, income):
         income
     )
 
-    prediction = model.predict(features)[0]
-
+    prediction = m.predict(features)[0]
     return round(prediction, 2)
