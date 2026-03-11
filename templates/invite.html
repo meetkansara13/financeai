@@ -8,9 +8,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Invite Friends — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
-    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
-    <script src="/static/js/app.js?v=50"></script>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=60">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=60">
+    <script src="/static/js/app.js?v=60"></script>
     <style>
         .invite-hero {
             margin: 16px 16px 0;
@@ -292,6 +292,81 @@
         .empty-state .e-ico {
             font-size: 36px;
             margin-bottom: 8px;
+        }
+
+        /* ═══ LIGHT MODE ═══ */
+        html.light-mode body,
+        html.light-mode .page-wrapper {
+            background: #f0f4f8 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode h1,
+        html.light-mode h2,
+        html.light-mode h3,
+        html.light-mode h4,
+        html.light-mode h5 {
+            color: #0f172a !important;
+        }
+
+        html.light-mode p,
+        html.light-mode span,
+        html.light-mode div,
+        html.light-mode label {
+            color: inherit;
+        }
+
+        html.light-mode [class*="card"],
+        html.light-mode [class*="section"],
+        html.light-mode [class*="panel"],
+        html.light-mode [class*="box"],
+        html.light-mode [class*="item"],
+        html.light-mode [class*="row"] {
+            background-color: #ffffff;
+            border-color: rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-mode [style*="background: rgba(255"],
+        html.light-mode [style*="background:rgba(255"] {
+            background: rgba(0, 0, 0, 0.03) !important;
+        }
+
+        html.light-mode [style*="color: #e2e8f0"],
+        html.light-mode [style*="color:#e2e8f0"],
+        html.light-mode [style*="color: #f1f5f9"],
+        html.light-mode [style*="color:#f1f5f9"],
+        html.light-mode [style*="color: #cbd5e1"],
+        html.light-mode [style*="color:#cbd5e1"] {
+            color: #0f172a !important;
+        }
+
+        html.light-mode [style*="color: #94a3b8"],
+        html.light-mode [style*="color:#94a3b8"],
+        html.light-mode [style*="color: #64748b"],
+        html.light-mode [style*="color:#64748b"],
+        html.light-mode [style*="color: #475569"],
+        html.light-mode [style*="color:#475569"] {
+            color: #475569 !important;
+        }
+
+        html.light-mode input,
+        html.light-mode select,
+        html.light-mode textarea {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+        }
+
+        html.light-mode .pill {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        html.light-mode .pill.active {
+            background: rgba(201, 168, 76, 0.13) !important;
+            border-color: rgba(201, 168, 76, 0.4) !important;
+            color: #c9a84c !important;
         }
     </style>
 </head>

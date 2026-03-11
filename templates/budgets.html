@@ -8,7 +8,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <meta charset="UTF-8">
     <title>Smart Budget — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=60">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="/static/js/app.js"></script>
     <style>
@@ -780,8 +780,75 @@
                 transform: translateY(0)
             }
         }
+
+        /* ═══ LIGHT MODE ═══ */
+        html.light-mode body,
+        html.light-mode .page-wrapper {
+            background: #f0f4f8 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode .an-kpi-card,
+        html.light-mode .chart-card,
+        html.light-mode .score-card,
+        html.light-mode .an-card,
+        html.light-mode .txn-item,
+        html.light-mode .txn-row,
+        html.light-mode .budget-card,
+        html.light-mode .bc-card,
+        html.light-mode .filter-bar,
+        html.light-mode .txn-filter,
+        html.light-mode .section-card,
+        html.light-mode .stat-card,
+        html.light-mode .rank-card,
+        html.light-mode .date-group,
+        html.light-mode .cat-rank-item {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode .an-kpi-label,
+        html.light-mode .chart-label,
+        html.light-mode .txn-meta,
+        html.light-mode .date-header,
+        html.light-mode .date-sum {
+            color: #64748b !important;
+        }
+
+        html.light-mode .txn-name,
+        html.light-mode .cat-name,
+        html.light-mode .rank-name {
+            color: #0f172a !important;
+        }
+
+        html.light-mode .pill {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        html.light-mode .pill.active {
+            background: rgba(201, 168, 76, 0.13) !important;
+            border-color: rgba(201, 168, 76, 0.4) !important;
+            color: #c9a84c !important;
+        }
+
+        html.light-mode select,
+        html.light-mode input {
+            background: #f8fafc !important;
+            color: #0f172a !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+        }
+
+        html.light-mode h1,
+        html.light-mode h2,
+        html.light-mode h3,
+        html.light-mode h4 {
+            color: #0f172a !important;
+        }
     </style>
-    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=60">
 </head>
 
 <body>

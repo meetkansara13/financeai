@@ -7,8 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <title>Transactions — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/sidebar.css?v=50">
-    <link rel="stylesheet" href="/static/css/dashboard.css?v=50">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=60">
     <script src="/static/js/app.js"></script>
     <link
         href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap"
@@ -22,6 +21,7 @@
 
         .page-wrapper {
             padding: 24px 28px;
+            overflow-x: hidden;
         }
 
         /* ── Top bar ── */
@@ -353,8 +353,96 @@
                 grid-template-columns: repeat(2, 1fr);
             }
         }
+
+        /* ═══ LIGHT MODE ═══ */
+        html.light-mode body,
+        html.light-mode .page-wrapper {
+            background: #f0f4f8 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode .txn-topbar h1,
+        html.light-mode .txn-topbar p {
+            color: #0f172a !important;
+        }
+
+        html.light-mode .txn-topbar p {
+            color: #64748b !important;
+        }
+
+        html.light-mode .sum-card {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-mode .sum-lbl {
+            color: #64748b !important;
+        }
+
+        html.light-mode .txn-row {
+            background: #ffffff !important;
+            border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+        }
+
+        html.light-mode .txn-row:hover {
+            background: #f8fafc !important;
+        }
+
+        html.light-mode .txn-desc {
+            color: #0f172a !important;
+        }
+
+        html.light-mode .txn-sub {
+            color: #64748b !important;
+        }
+
+        html.light-mode .txn-date-sm {
+            color: #94a3b8 !important;
+        }
+
+        html.light-mode .date-header {
+            color: #64748b !important;
+        }
+
+        html.light-mode .date-sum {
+            color: #64748b !important;
+        }
+
+        html.light-mode .date-group-card {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+        }
+
+        html.light-mode .pill {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        html.light-mode .pill.active {
+            background: rgba(201, 168, 76, 0.13) !important;
+            border-color: rgba(201, 168, 76, 0.4) !important;
+            color: #c9a84c !important;
+        }
+
+        html.light-mode input#txnSearch {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+        }
+
+        html.light-mode h1,
+        html.light-mode h2,
+        html.light-mode h3,
+        html.light-mode h4 {
+            color: #0f172a !important;
+        }
+
+        html.light-mode .month-nav {
+            color: #0f172a !important;
+        }
     </style>
-    <link rel="stylesheet" href="/static/css/mobile.css?v=50">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=60">
 </head>
 
 <body>

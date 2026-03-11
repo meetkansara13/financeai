@@ -8,10 +8,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>AI Insights — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/sidebar.css?v=31">
-    <link rel="stylesheet" href="/static/css/mobile.css?v=31">
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=60">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=60">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    <script src="/static/js/app.js?v=31"></script>
+    <script src="/static/js/app.js?v=60"></script>
     <style>
         /* Chat */
         .chat-msgs {
@@ -226,6 +226,35 @@
         .mini-stat-row .row .val {
             font-weight: 700;
             color: #94a3b8;
+        }
+
+        /* ═══ LIGHT MODE ═══ */
+        html.light-mode body,
+        html.light-mode .page-wrapper {
+            background: #f0f4f8 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode .chat-msg.bot {
+            background: #ffffff !important;
+            color: #0f172a !important;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+
+        html.light-mode .chat-input {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.12) !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode [class*="-card"],
+        html.light-mode [class*="-panel"],
+        html.light-mode [class*="-section"],
+        html.light-mode .wp-section,
+        html.light-mode .an-kpi-card {
+            background: #ffffff !important;
+            border-color: rgba(0, 0, 0, 0.08) !important;
+            color: #0f172a !important;
         }
     </style>
 </head>

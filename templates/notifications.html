@@ -8,9 +8,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Notifications — FinanceAI</title>
-    <link rel="stylesheet" href="/static/css/sidebar.css?v=32">
-    <link rel="stylesheet" href="/static/css/mobile.css?v=32">
-    <script src="/static/js/app.js?v=32"></script>
+    <link rel="stylesheet" href="/static/css/sidebar.css?v=60">
+    <link rel="stylesheet" href="/static/css/mobile.css?v=60">
+    <script src="/static/js/app.js?v=60"></script>
     <style>
         .notif-item {
             display: flex;
@@ -96,6 +96,60 @@
             font-weight: 700;
             cursor: pointer;
             font-family: 'Nunito', sans-serif;
+        }
+
+        /* ═══ LIGHT MODE ═══ */
+        html.light-mode body,
+        html.light-mode .page-wrapper {
+            background: #f0f4f8 !important;
+            color: #0f172a !important;
+        }
+
+        html.light-mode .notif-item {
+            border-bottom-color: rgba(0, 0, 0, 0.06) !important;
+        }
+
+        html.light-mode .notif-item:hover {
+            background: rgba(0, 0, 0, 0.02) !important;
+        }
+
+        html.light-mode .notif-item.unread {
+            background: rgba(245, 200, 66, 0.06) !important;
+        }
+
+        html.light-mode .notif-title {
+            color: #0f172a !important;
+        }
+
+        html.light-mode .notif-body {
+            color: #475569 !important;
+        }
+
+        html.light-mode .notif-time {
+            color: #94a3b8 !important;
+        }
+
+        html.light-mode .notif-section-label {
+            color: #64748b !important;
+        }
+
+        html.light-mode .pill {
+            background: rgba(0, 0, 0, 0.04) !important;
+            border-color: rgba(0, 0, 0, 0.1) !important;
+            color: #475569 !important;
+        }
+
+        html.light-mode .pill.active {
+            background: rgba(201, 168, 76, 0.13) !important;
+            border-color: rgba(201, 168, 76, 0.4) !important;
+            color: #c9a84c !important;
+        }
+
+        html.light-mode h1,
+        html.light-mode h2,
+        html.light-mode h3,
+        html.light-mode h4 {
+            color: #0f172a !important;
         }
     </style>
 </head>

@@ -640,10 +640,25 @@ async function enterUpdateMode() {
 /* ════════════════════════════
    INIT
 ════════════════════════════ */
+
+/* DOB DROPDOWN SYNC */
+function syncDob() {
+    const d = document.getElementById('dobDay')?.value;
+    const m = document.getElementById('dobMonth')?.value;
+    const y = document.getElementById('dobYear')?.value;
+    const dob = document.getElementById('dob');
+    if (dob && d && m && y) dob.value = y + '-' + m + '-' + d;
+}
+
 document.addEventListener("DOMContentLoaded", async () => {
 
     // Fast-path: if we already know profile was submitted (stored locally), hide form immediately
-    const profileKey = "wp_submitted_" + (token ? token.slice(-12) : "user");
+    ['dobDay','dobMonth','dobYear'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.addEventListener('change', syncDob);
+    });
+
+        const profileKey = "wp_submitted_" + (token ? token.slice(-12) : "user");
     if (localStorage.getItem(profileKey) === "1") {
         // Hide form instantly while API loads
         document.querySelectorAll(".form-step").forEach(s => s.style.display = "none");
@@ -675,11 +690,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         } else {
             // 404 = no profile — restore form if we hid it prematurely
             localStorage.removeItem(profileKey);
-            document.querySelectorAll(".form-step").forEach((s, i) => {
-                s.style.display = i === 0 ? "block" : "none";
+            document.querySelectorAll(".form-step").forEach(s => {
+                s.style.display = ""; // remove inline style, let CSS handle it
             });
             const nav = document.querySelector(".step-nav");
             if (nav) nav.style.display = "";
+            goToStep(1); // ensure step 1 is active
         }
 
         // No profile yet, show the form normally
@@ -688,4 +704,4 @@ document.addEventListener("DOMContentLoaded", async () => {
     }
 
     await loadVerificationStatus();
-});
+}); 

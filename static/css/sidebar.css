@@ -790,3 +790,114 @@ html.light-mode .search-box:focus {
 html.light-mode .sb-backdrop {
     background: rgba(0, 0, 0, 0.4);
 }
+
+/* ══════════════════════════════════════
+   PROFESSIONAL DATE / INPUT STYLING
+══════════════════════════════════════ */
+input[type="date"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="time"] {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: #e2e8f0;
+    font-size: 13.5px;
+    font-family: 'Nunito', 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+    outline: none;
+    width: 100%;
+}
+
+input[type="date"]:hover,
+input[type="datetime-local"]:hover {
+    border-color: rgba(201, 168, 76, 0.4);
+    background: rgba(255, 255, 255, 0.07);
+}
+
+input[type="date"]:focus,
+input[type="datetime-local"]:focus {
+    border-color: #c9a84c;
+    background: rgba(201, 168, 76, 0.06);
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator,
+input[type="datetime-local"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7) sepia(1) saturate(3) hue-rotate(10deg);
+    cursor: pointer;
+    opacity: 0.8;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+}
+
+/* Light mode date inputs */
+html.light-mode input[type="date"],
+html.light-mode input[type="datetime-local"],
+html.light-mode input[type="month"],
+html.light-mode input[type="time"] {
+    background: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+}
+
+html.light-mode input[type="date"]:focus,
+html.light-mode input[type="datetime-local"]:focus {
+    border-color: #c9a84c;
+    background: #fffdf5;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}
+
+html.light-mode input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: none;
+    opacity: 0.6;
+}
+
+/* Professional select styling */
+select {
+    appearance: none;
+    -webkit-appearance: none;
+    background: rgba(255, 255, 255, 0.05) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat right 12px center;
+    border: 1.5px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 10px 36px 10px 14px;
+    color: #e2e8f0;
+    font-size: 13.5px;
+    font-family: 'Nunito', 'DM Sans', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s;
+    outline: none;
+}
+
+select:hover {
+    border-color: rgba(201, 168, 76, 0.4);
+}
+
+select:focus {
+    border-color: #c9a84c;
+    box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.12);
+}
+
+html.light-mode select {
+    background-color: #ffffff;
+    border-color: rgba(0, 0, 0, 0.12);
+    color: #0f172a;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c9a84c' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+}
+
+/* Fix dropdown option text visibility */
+select option {
+    background: #1e2535;
+    color: #f1f5f9;
+}
+
+html.light-mode select option {
+    background: #ffffff;
+    color: #0f172a;
+}

@@ -439,11 +439,13 @@ body {
 
 .hero-balance-row {
     display: flex;
-    gap: 16px;
+    gap: 10px;
+    flex-wrap: wrap;
 }
 
 .hero-mini-stat {
     flex: 1;
+    min-width: 90px;
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border2);
     border-radius: 12px;
